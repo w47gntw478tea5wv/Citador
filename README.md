@@ -1,7 +1,14 @@
 # Citador
 Um plugin pra facilitar a citação no chat, assim, nem você nem ninguém se perde no assunto :wink:
 
-###Instalação
+###Instalação do BetterDiscord
+
+1. Vá até o [site do BetterDiscord](http://betterdiscord.net)
+2. Baixe a versão do seu sistema
+3. Extraia os arquivos do zip
+4. Instale, clicando no arquivo .exe
+
+###Instalação do plugin
 
 ####Obtendo arquivos
 Para instalar, siga os passos da instalação de um plugin comum:
@@ -21,7 +28,7 @@ Para pegar o seu token, siga esses passos:
 ####Instalando token
 Agora que você tem o seu token, pra colocá-lo no arquivo, siga esses passos:
 
-1. Abra o arquivo `Citador.plugin.js` e coloque o token onde diz `COLOQUE SEU TOKEN AQUI ` (coloque ele entre aspas, por favor ~~se jão não tiver copiado com aspas~~)
+1. Abra o arquivo `Citador.plugin.js` e coloque o token onde diz `COLOQUE SEU TOKEN AQUI ` (coloque ele entre aspas, por favor ~~se já não tiver copiado com aspas~~)
 2. Salve o arquivo e dê reload no Discord com `Ctrl` + `R`
 3. Prontinho, agora você está com o plugin instalado e funcionando.
 
