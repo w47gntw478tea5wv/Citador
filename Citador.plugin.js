@@ -26,7 +26,7 @@ Citador.prototype.getDescription = function() {
     return "Cita alguem no chat";
 };
 Citador.prototype.getVersion = function() {
-    return "1.4.2";
+    return "1.4.3";
 };
 Citador.prototype.getAuthor = function() {
     return "Nirewen";
@@ -148,7 +148,11 @@ Citador.prototype.attachParser = function() {
 				// trocar os emotes por texto
 				$('.quote-msg').find('.emotewrapper').each(function() {
 					$(this).html($(this).find('img').attr('alt'));
-				})
+				});
+				
+				$('.quote-msg').find('.emoji').each(function() {
+					$(this).html($(this).attr('alt'));
+				});
 				
 				// definir texto pra citar
 				quoteMsg.find('.markup').each(function() {
