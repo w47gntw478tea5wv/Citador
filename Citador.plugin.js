@@ -26,7 +26,7 @@ Citador.prototype.getDescription = function() {
     return "Cita alguem no chat";
 };
 Citador.prototype.getVersion = function() {
-    return "1.4";
+    return "1.4.2";
 };
 Citador.prototype.getAuthor = function() {
     return "Nirewen";
