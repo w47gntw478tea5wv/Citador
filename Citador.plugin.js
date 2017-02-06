@@ -105,9 +105,11 @@ Citador.prototype.start = function() {
 							if ($('.chat .title-wrap .channel-name.channel-private').length >= 1) { 
 								chanName = "@" + $('.chat .title-wrap .channel-name').text();
 							}
+
 							if ($('.chat .title-wrap .channel-name:not(.channel-private)').length >= 1) {
 								chanName = "#" + $('.chat .title-wrap .channel-name').text();
 							}
+							
 							$('.quote-msg').find('.btn-reaction').remove();
 							$('.quote-msg').find('.btn-option').css('background-image', `url(${closeImg})`);
 							
@@ -270,7 +272,8 @@ Citador.prototype.getSettingsPanel = function() {
 
 Citador.prototype.onSwitch = function () {
 	this.attachParser();
-	if (isQuote == true) {
+
+	if (isQuote) {
 		$('.channel-textarea').prepend(elem);
 	}
 };
