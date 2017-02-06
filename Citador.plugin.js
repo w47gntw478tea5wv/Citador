@@ -25,6 +25,14 @@ function cancelQuote() {
 	quoting = false;
 }
 
+function reset(e) {
+	isQuote = false;
+	quoting = false;
+	$('.quote-msg').remove();
+	e.preventDefault();
+	e.stopPropagation();
+}
+
 Citador.prototype.getName = function() {
     return "Citador";
 };
@@ -233,11 +241,8 @@ Citador.prototype.attachParser = function() {
 			// redefinir variaveis importantes,
 			// as variaveis que mudam toda hora não precisam redefinir (como user, color, newText...)
 			$(this).val("");
-			isQuote = false;
-			quoting = false;
-			$('.quote-msg').remove();
-			e.preventDefault();
-			e.stopPropagation();
+			reset(e);
+			
 			return;
 		} 
 		catch(e) {
