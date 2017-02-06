@@ -41,16 +41,20 @@ function cancelQuote() {
 Citador.prototype.start = function() {
 	this.attachParser();
 	BdApi.injectCSS("citador-segoemdl2-font", "@font-face {font-family: 'Segoe MDL2 Assets';src: url('https://crossorigin.me/https://nirewen.s-ul.eu/WJJ3bKJl.ttf');}");
+	
 	$(document).on("mouseover.rprq", function(e) {
 		var target = $(e.target);
+
 		if(target.parents(".message").length > 0) {
 			var isCompact = false;
 			var allmessages = $('.messages .message-group');
 			var nameDateBlock = $('.messages .message-group .comment .body h2');
 			var replyBtn = '<span class="citar-btn" style="cursor:pointer;color:#fff !important;position:relative;top:-1px;margin-left:5px;text-transform:uppercase;font-size:10px;padding:3px 5px;background:rgba(0,0,0,0.4);font-family: Segoe MDL2 Assets;border-radius: 3px;"></span>';
+			
 			allmessages.on('mouseover',function() {
 				if (nameDateBlock.find('.citar-btn').length == 0) {
 					$(this).find(nameDateBlock).append(replyBtn);
+
 					$(this).find('.citar-btn').on('mousedown',function(){return false;}).click(function() {
 						var messag = $(this).parents('.message-group');
 						isQuote = true;
@@ -68,6 +72,7 @@ Citador.prototype.start = function() {
 							if ($('.chat .title-wrap .channel-name.channel-private').length >= 1) {
 								chanName = "@" + $('.chat .title-wrap .channel-name').text();
 							}
+
 							if ($('.chat .title-wrap .channel-name:not(.channel-private)').length >= 1) {
 								chanName = "#" + $('.chat .title-wrap .channel-name').text();
 							}
@@ -115,6 +120,7 @@ Citador.prototype.start = function() {
 					});
 				}
 			});
+
 			allmessages.on('mouseleave',function() {
 				if (nameDateBlock.find('.citar-btn').length == 1) {
 					$(this).find('.citar-btn').empty().remove();
@@ -122,17 +128,19 @@ Citador.prototype.start = function() {
 			});
 		}
 	});
+
 	console.log('Citador iniciado.');
 };
 
 Citador.prototype.attachParser = function() {
 	var el = $('.channel-textarea textarea');
 	if (el.length == 0) return;
+
 	this.handleKeypress = function (e) {
 		var code = e.keyCode || e.which;
-		if(code !== 13) return;
+		if (code !== 13) return;
 		try {
-			if(isQuote == true) {
+			if (isQuote == true) {
 				if (e.shiftKey) return;
 				if ($('.channel-textarea-autocomplete-inner').length >= 1) return;
 				
@@ -233,22 +241,26 @@ Citador.prototype.attachParser = function() {
 			console.warn("Citador: " + e);
 		}
 	};
+
 	el[0].addEventListener("keydown", this.handleKeypress, false);
 }
 
 Citador.prototype.load = function() {};
+
 Citador.prototype.unload = function() {
 	$(document).off("mouseover.rprq");
 	$('.messages .message-group').off('mouseover');
 	$('.messages .message-group').off('mouseleave');
 	BdApi.clearCSS("citador-segoemdl2-font");
 };
+
 Citador.prototype.stop = function() {
 	$(document).off("mouseover.rprq");
 	$('.messages .message-group').off('mouseover');
 	$('.messages .message-group').off('mouseleave');
 	BdApi.clearCSS("citador-segoemdl2-font");
 };
+
 Citador.prototype.getSettingsPanel = function() {
 	return '';
 };
