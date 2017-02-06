@@ -145,6 +145,11 @@ Citador.prototype.attachParser = function() {
 					quoteMsg = $('.quote-msg').find('.comment'),
 					text = '';
 				
+				// trocar os emotes por texto
+				$('.quote-msg').find('.emotewrapper').each(function() {
+					$(this).html($(this).find('img').attr('alt'));
+				})
+				
 				// definir texto pra citar
 				quoteMsg.find('.markup').each(function() {
 					text += $(this).clone().find('.copybutton').remove().end().text() + '\n';
