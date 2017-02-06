@@ -19,24 +19,27 @@ function rgbToHex(r, g, b) {
 	return componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-Citador.prototype.getName = function() {
-    return "Citador";
-};
-Citador.prototype.getDescription = function() {
-    return "Cita alguem no chat";
-};
-Citador.prototype.getVersion = function() {
-    return "1.4.3";
-};
-Citador.prototype.getAuthor = function() {
-    return "Nirewen";
-};
-
 function cancelQuote() {
 	$('.quote-msg').remove(); 
 	isQuote = false; 
 	quoting = false;
 }
+
+Citador.prototype.getName = function() {
+    return "Citador";
+};
+
+Citador.prototype.getDescription = function() {
+    return "Cita alguem no chat";
+};
+
+Citador.prototype.getVersion = function() {
+    return "1.4.3";
+};
+
+Citador.prototype.getAuthor = function() {
+    return "Nirewen";
+};
 
 Citador.prototype.start = function() {
 	this.attachParser();
