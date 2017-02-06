@@ -109,7 +109,7 @@ Citador.prototype.start = function() {
 							if ($('.chat .title-wrap .channel-name:not(.channel-private)').length >= 1) {
 								chanName = "#" + $('.chat .title-wrap .channel-name').text();
 							}
-							
+
 							$('.quote-msg').find('.btn-reaction').remove();
 							$('.quote-msg').find('.btn-option').css('background-image', `url(${closeImg})`);
 							
@@ -141,106 +141,104 @@ Citador.prototype.attachParser = function() {
 	var el = $('.channel-textarea textarea');
 	if (el.length == 0) return;
 
-	this.handleKeypress = function (e) {
+	this.handleKeypress = function(e) {
 		var code = e.keyCode || e.which;
 		if (code !== 13) return;
+
 		try {
-			if (isQuote == true) {
-				if (e.shiftKey) return;
-				if ($('.channel-textarea-autocomplete-inner').length >= 1) return;
-				
-				var color = $('.quote-msg').find('.user-name').css('color'),
-					user = $('.quote-msg').find('.user-name').text(),
-					avatarUrl = $('.quote-msg').find('.avatar-large').css('background-image').replace(/.*\s?url\([\'\"]?/, '').replace(/[\'\"]?\).*/, ''),
-					newText,
-					oldText = $('.content .channel-textarea textarea').val(),
-					hourpost = $('.quote-msg').find('.timestamp').text(),
-					quoteMsg = $('.quote-msg').find('.comment'),
-					text = '';
-				
-				// trocar os emotes por texto
-				$('.quote-msg').find('.emotewrapper').each(function() {
-					$(this).html($(this).find('img').attr('alt'));
-				});
-				
-				$('.quote-msg').find('.emoji').each(function() {
-					$(this).html($(this).attr('alt'));
-				});
-				
-				// definir texto pra citar
-				quoteMsg.find('.markup').each(function() {
-					text += $(this).clone().find('.copybutton').remove().end().text() + '\n';
-				});
-				
-				// remover o editado da mensagem e ir pra próxima, sucessivamente
-				newText = text.split("(editado)").join("");
-				
-				// converte a cor do cargo pra hex 
-				color = color.split(",");                      // não tenho maneira melhor
-				color[0] = Number(color[0].split('rgb(')[1]);  // de separar os dados de cor rgb
-				color[1] = Number(color[1]);
-				color[2] = Number(color[2].split(')')[0]);
-				color = Number('0x' + rgbToHex(color[0], color[1], color[2]).toString());
-				
-				// os dados do embed 
-				var data = {
-						content: oldText,
-						embed: {
-							author: {
-								name: user,
-								icon_url: avatarUrl
-							},
-							description: newText,
-							footer: {
-								text: `in ${chanName} - ${hourpost}`
-							},
-							image: {url: ''},
-							fields: [],
-							color: color
-						}
-					},
-					chanID = window.location.pathname.split('/').pop();
-				
-				// checar se tem alguma imagem na mensagem citada, e adicionar ao embed final
-				if ($('.quote-msg').find('.attachment-image').length >= 1) {
-					data.embed.image.url = $('.quote-msg').find('.attachment-image a').attr('href');
-				}
-				
-				// checar se tem algum arquivo na mensagem citada, e adicionar ao embed final
-				if ($('.quote-msg').find('.attachment').length >= 1) {
-					for (i = 0; i < $('.quote-msg').find('.attachment').length; i++) {
-						var value = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').text();
-						var link = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').attr('href');
-						var attachNum = i + 1;
-						data.embed.fields.push({name: "Attachment #" + attachNum, value: `📁 [${value}](${link})`});
+			if (!isQuote || e.shiftKey || $('.channel-textarea-autocomplete-inner').length >= 1) return;
+			
+			var color = $('.quote-msg').find('.user-name').css('color'),
+				user = $('.quote-msg').find('.user-name').text(),
+				avatarUrl = $('.quote-msg').find('.avatar-large').css('background-image').replace(/.*\s?url\([\'\"]?/, '').replace(/[\'\"]?\).*/, ''),
+				newText,
+				oldText = $('.content .channel-textarea textarea').val(),
+				hourpost = $('.quote-msg').find('.timestamp').text(),
+				quoteMsg = $('.quote-msg').find('.comment'),
+				text = '';
+			
+			// trocar os emotes por texto
+			$('.quote-msg').find('.emotewrapper').each(function() {
+				$(this).html($(this).find('img').attr('alt'));
+			});
+			
+			$('.quote-msg').find('.emoji').each(function() {
+				$(this).html($(this).attr('alt'));
+			});
+			
+			// definir texto pra citar
+			quoteMsg.find('.markup').each(function() {
+				text += $(this).clone().find('.copybutton').remove().end().text() + '\n';
+			});
+			
+			// remover o editado da mensagem e ir pra próxima, sucessivamente
+			newText = text.split("(editado)").join("");
+			
+			// converte a cor do cargo pra hex 
+			color = color.split(",");                      // não tenho maneira melhor
+			color[0] = Number(color[0].split('rgb(')[1]);  // de separar os dados de cor rgb
+			color[1] = Number(color[1]);
+			color[2] = Number(color[2].split(')')[0]);
+			color = Number('0x' + rgbToHex(color[0], color[1], color[2]).toString());
+			
+			// os dados do embed 
+			var data = {
+					content: oldText,
+					embed: {
+						author: {
+							name: user,
+							icon_url: avatarUrl
+						},
+						description: newText,
+						footer: {
+							text: `in ${chanName} - ${hourpost}`
+						},
+						image: {url: ''},
+						fields: [],
+						color: color
 					}
-				}
-				
-				// post do embed final
-				$.ajax({
-					type : "POST",
-					url : `https://discordapp.com/api/channels/${chanID}/messages`,
-					headers : {
-						"authorization": token
-					},
-					dataType : "json",
-					contentType : "application/json",
-					data: JSON.stringify(data),
-					error: (req, error, exception) => {
-						console.log(req.responseText);
-					}
-				});
-				
-				// redefinir variaveis importantes,
-				// as variaveis que mudam toda hora não precisam redefinir (como user, color, newText...)
-				$(this).val("");
-				isQuote = false;
-				quoting = false;
-				$('.quote-msg').remove();
-				e.preventDefault();
-				e.stopPropagation();
-				return;
+				},
+				chanID = window.location.pathname.split('/').pop();
+			
+			// checar se tem alguma imagem na mensagem citada, e adicionar ao embed final
+			if ($('.quote-msg').find('.attachment-image').length >= 1) {
+				data.embed.image.url = $('.quote-msg').find('.attachment-image a').attr('href');
 			}
+			
+			// checar se tem algum arquivo na mensagem citada, e adicionar ao embed final
+			if ($('.quote-msg').find('.attachment').length >= 1) {
+				for (i = 0; i < $('.quote-msg').find('.attachment').length; i++) {
+					var value = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').text();
+					var link = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').attr('href');
+					var attachNum = i + 1;
+					data.embed.fields.push({name: "Attachment #" + attachNum, value: `📁 [${value}](${link})`});
+				}
+			}
+			
+			// post do embed final
+			$.ajax({
+				type : "POST",
+				url : `https://discordapp.com/api/channels/${chanID}/messages`,
+				headers : {
+					"authorization": token
+				},
+				dataType : "json",
+				contentType : "application/json",
+				data: JSON.stringify(data),
+				error: (req, error, exception) => {
+					console.log(req.responseText);
+				}
+			});
+			
+			// redefinir variaveis importantes,
+			// as variaveis que mudam toda hora não precisam redefinir (como user, color, newText...)
+			$(this).val("");
+			isQuote = false;
+			quoting = false;
+			$('.quote-msg').remove();
+			e.preventDefault();
+			e.stopPropagation();
+			return;
 		} 
 		catch(e) {
 			console.warn("Citador: " + e);
