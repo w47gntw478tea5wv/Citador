@@ -11,7 +11,7 @@ var elem, chanName;
 
 // converter rgb pra hex
 function componentToHex(c) {
-	var hex = c.toString(16);
+	var hex = Number(c).toString(16);
 	return hex.length == 1 ? "0" + hex : hex;
 }
 
@@ -176,9 +176,9 @@ Citador.prototype.attachParser = function() {
 			
 			// converte a cor do cargo pra hex 
 			color = color.split(",");                      // não tenho maneira melhor
-			color[0] = Number(color[0].split('rgb(')[1]);  // de separar os dados de cor rgb
-			color[1] = Number(color[1]);
-			color[2] = Number(color[2].split(')')[0]);
+			color[0] = color[0].split('rgb(')[1];  // de separar os dados de cor rgb
+			color[1] = color[1];
+			color[2] = color[2].split(')')[0];
 			color = Number('0x' + rgbToHex(color[0], color[1], color[2]).toString());
 			
 			// os dados do embed 
