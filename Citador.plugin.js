@@ -7,7 +7,8 @@ var Citador = function () {};
 var isQuote = false;
 var quoting = false;
 
-var elem, chanName;
+var elem;
+var chanName;
 
 // converter rgb pra hex
 function componentToHex(c) {
@@ -156,7 +157,8 @@ Citador.prototype.attachParser = function() {
 		try {
 			if (!isQuote || e.shiftKey || $('.channel-textarea-autocomplete-inner').length >= 1) return;
 			
-			var color = $('.quote-msg').find('.user-name').css('color'),
+			var 
+				color = $('.quote-msg').find('.user-name').css('color');
 				user = $('.quote-msg').find('.user-name').text(),
 				avatarUrl = $('.quote-msg').find('.avatar-large').css('background-image').replace(/.*\s?url\([\'\"]?/, '').replace(/[\'\"]?\).*/, ''),
 				newText,
@@ -183,11 +185,8 @@ Citador.prototype.attachParser = function() {
 			newText = text.split("(editado)").join("");
 			
 			// converte a cor do cargo pra hex 
-			color = color.split(",");                      // não tenho maneira melhor
-			color[0] = color[0].split('rgb(')[1];  // de separar os dados de cor rgb
-			color[1] = color[1];
-			color[2] = color[2].split(')')[0];
-			color = Number('0x' + rgbToHex(color[0], color[1], color[2]).toString());
+			color = color.split(/.(\d{3})./);
+			color = Number('0x' + rgbToHex(color[1], color[2], color[3]).toString());
 			
 			// os dados do embed 
 			var data = {
@@ -242,7 +241,7 @@ Citador.prototype.attachParser = function() {
 			// as variaveis que mudam toda hora não precisam redefinir (como user, color, newText...)
 			$(this).val("");
 			reset(e);
-			
+
 			return;
 		} 
 		catch(e) {
