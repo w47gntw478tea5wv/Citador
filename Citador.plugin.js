@@ -187,7 +187,7 @@ Citador.prototype.attachParser = function() {
 			newText = text.split("(editado)").join("");
 			
 			// converte a cor do cargo pra hex 
-			color = color.split(/.(\d{3})./);
+			color = color.split(/(\d{1,3})/);
 			color = Number('0x' + rgbToHex(color[1], color[3], color[5]).toString());
 			
 			// os dados do embed 
