@@ -68,14 +68,14 @@ Citador.prototype.start = function() {
 					$(this).find(nameDateBlock).append(replyBtn);
 
 					$(this).find('.citar-btn').on('mousedown',function(){return false;}).click(function() {
-						var messag = $(this).parents('.message-group');
+						var message = $(this).parents('.message-group');
 						isQuote = true;
 						
 						var closeImg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KICA8ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgPHJlY3Qgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ii8+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNOSwyIEMxMi44NzEsMiAxNiw1LjEyOSAxNiw5IEMxNiwxMi44NzEgMTIuODcxLDE2IDksMTYgQzUuMTI5LDE2IDIsMTIuODcxIDIsOSBDMiw1LjEyOSA1LjEyOSwyIDksMiBMOSwyIFogTTExLjY5MjUsNS4yNSBMOSw3Ljk0MjUgTDYuMzA3NSw1LjI1IEw1LjI1LDYuMzA3NSBMNy45NDI1LDkgTDUuMjUsMTEuNjkyNSBMNi4zMDc1LDEyLjc1IEw5LDEwLjA1NzUgTDExLjY5MjUsMTIuNzUgTDEyLjc1LDExLjY5MjUgTDEwLjA1NzUsOSBMMTIuNzUsNi4zMDc1IEwxMS42OTI1LDUuMjUgWiIvPgogIDwvZz4KPC9zdmc+Cg==";
 						
 						if (quoting) { // nova citação
 							$('.quote-msg').find('.message-group').remove();
-							$(messag).clone().appendTo('.quote-msg').show('slow');
+							$(message).clone().appendTo('.quote-msg').show('slow');
 							$('.quote-msg .message-group').append(`<img src="${closeImg}" class="quote-close" height="20" width="20" style="float: right; cursor: pointer" onClick="cancelQuote()">`)
 							$('.content .channel-textarea textarea').focus();
 							elem = $('.quote-msg');
@@ -105,7 +105,7 @@ Citador.prototype.start = function() {
 						if (!quoting) {
 							quoting = true;
 							$('.channel-textarea').prepend('<div class="quote-msg"></div>')
-							$(messag).clone().appendTo(".quote-msg").show('slow');
+							$(message).clone().appendTo(".quote-msg").show('slow');
 							$('.quote-msg .message-group').append(`<img src="${closeImg}" class="quote-close" height="20" width="20" style="float: right; cursor: pointer" onClick="cancelQuote()">`)
 							$('.content .channel-textarea textarea').focus();
 							elem = $('.quote-msg');
@@ -241,8 +241,6 @@ Citador.prototype.attachParser = function() {
 			// as variaveis que mudam toda hora não precisam redefinir (como user, color, newText...)
 			$(this).val("");
 			reset(e);
-
-			return;
 		} 
 		catch(e) {
 			console.warn("Citador: " + e);
