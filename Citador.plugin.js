@@ -161,7 +161,7 @@ Citador.prototype.attachParser = function() {
 				color = $('.quote-msg').find('.user-name').css('color');
 				user = $('.quote-msg').find('.user-name').text(),
 				avatarUrl = $('.quote-msg').find('.avatar-large').css('background-image').replace(/.*\s?url\([\'\"]?/, '').replace(/[\'\"]?\).*/, ''),
-				newText,
+				newText = '',
 				oldText = $('.content .channel-textarea textarea').val(),
 				hourpost = $('.quote-msg').find('.timestamp').text(),
 				quoteMsg = $('.quote-msg').find('.comment'),
