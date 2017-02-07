@@ -67,13 +67,16 @@ Citador.prototype.start = function() {
 				if (nameDateBlock.find('.citar-btn').length == 0) {
 					$(this).find(nameDateBlock).append(replyBtn);
 
-					$(this).find('.citar-btn').on('mousedown',function(){return false;}).click(function() {
+					$(this).find('.citar-btn').on('mousedown', function() {
+						return false;
+					})
+					.click(function() {
 						var message = $(this).parents('.message-group');
 						isQuote = true;
 						
 						var closeImg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KICA8ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgPHJlY3Qgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ii8+CiAgICA8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNOSwyIEMxMi44NzEsMiAxNiw1LjEyOSAxNiw5IEMxNiwxMi44NzEgMTIuODcxLDE2IDksMTYgQzUuMTI5LDE2IDIsMTIuODcxIDIsOSBDMiw1LjEyOSA1LjEyOSwyIDksMiBMOSwyIFogTTExLjY5MjUsNS4yNSBMOSw3Ljk0MjUgTDYuMzA3NSw1LjI1IEw1LjI1LDYuMzA3NSBMNy45NDI1LDkgTDUuMjUsMTEuNjkyNSBMNi4zMDc1LDEyLjc1IEw5LDEwLjA1NzUgTDExLjY5MjUsMTIuNzUgTDEyLjc1LDExLjY5MjUgTDEwLjA1NzUsOSBMMTIuNzUsNi4zMDc1IEwxMS42OTI1LDUuMjUgWiIvPgogIDwvZz4KPC9zdmc+Cg==";
 						elem = $('.quote-msg');
-						
+
 						if (quoting) { // nova citação
 							$('.quote-msg').find('.message-group').remove();
 							$(message).clone().appendTo('.quote-msg').show('slow');
@@ -237,7 +240,6 @@ Citador.prototype.attachParser = function() {
 			});
 			
 			// redefinir variaveis importantes,
-			// as variaveis que mudam toda hora não precisam redefinir (como user, color, newText...)
 			$(this).val("");
 			reset(e);
 		} 
