@@ -34,6 +34,8 @@ Agora que você tem o seu token, pra colocá-lo no arquivo, siga esses passos:
 
 Qualquer dúvida, me chame no Discord: Nirewen`#9011`
 
+Você também pode entrar no [servidor de suporte ao plugin](https://discord.gg/ubzHX8B) [PT]
+
 ###Bugs conhecidos
 - [ ] Não é possível mencionar canais nem pessoas enquanto está citando ☹
 - [x] ~~Se apertar Shift + Enter a linha não quebra, pelo contrário, manda a mensagem~~
