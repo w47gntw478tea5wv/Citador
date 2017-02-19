@@ -1,6 +1,12 @@
 # Citador
 Um plugin pra facilitar a citação no chat, assim, nem você nem ninguém se perde no assunto :wink:
 
+##Recursos
+- Permite ver a mensagem que será citada
+- Permite deletar uma mensagem que não deseja citar
+- Permite que você selecione uma mensagem que deseja citar
+- Permite que você mude de servidor ou canal enquanto está citando
+
 ###Instalação do BetterDiscord
 
 1. Vá até o [site do BetterDiscord](http://betterdiscord.net)
