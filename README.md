@@ -34,7 +34,7 @@ Para pegar o seu token, siga esses passos:
 ####Instalando token
 Agora que você tem o seu token, pra colocá-lo no arquivo, siga esses passos:
 
-1. Abra o arquivo `Citador.plugin.js` e coloque o token onde diz `COLOQUE SEU TOKEN AQUI ` (coloque ele entre aspas, por favor ~~se já não tiver copiado com aspas~~)
+1. Abra o arquivo `Citador.plugin.js` (com o Notepad++, de preferência) e coloque o token onde diz `COLOQUE SEU TOKEN AQUI ` (coloque ele entre aspas, por favor ~~se já não tiver copiado com aspas~~)
 2. Salve o arquivo e dê reload no Discord com `Ctrl` + `R`
 3. Prontinho, agora você está com o plugin instalado e funcionando.
 
@@ -47,4 +47,4 @@ Você também pode entrar no [servidor de suporte ao plugin](https://discord.gg/
 - [x] ~~Se apertar Shift + Enter a linha não quebra, pelo contrário, manda a mensagem~~
 
 ###Preview
-![Citador em ação](http://nirewen.s-ul.eu/1nTbSuas.gif)
+![Citador em ação](http://nirewen.s-ul.eu/02Tcv6ZT.gif)
