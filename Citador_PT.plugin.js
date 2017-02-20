@@ -20,8 +20,8 @@ class Citador {
 		this.quotingMsg = " CITANDO";
 		this.quoteTooltip = "Citar";
 		this.deleteTooltip = "Excluir";
-		this.closeImg = "https://imgh.us/closeImg_1.svg";
-		this.deleteMsgBtnImg = "https://imgh.us/deleteMsgBtn.svg";
+		this.closeImg = "https://discordapp.com/assets/14f734d6803726c94b970c3ed80c0864.svg";
+		this.deleteMsgBtnImg = "https://imgh.us/deleteMsgBtnImgHover.svg";
 		this.css = `
 			@font-face {
 				font-family: 'Segoe MDL2 Assets';
@@ -43,26 +43,36 @@ class Citador {
 				-webkit-transition: all 200ms ease-in-out;
 			}
 			.citar-btn.quoting {
-				background: rgba(0,179,0,0.4);
+				background: rgba(114, 137, 218, .8);
 				cursor: default;
 			}
 			.quote-close {
-				opacity: .8;
+				opacity: .5; 
 				float: right;
-				width: 20px;
-				height: 20px;
-				background-size: 20px 20px;
-				background-image: url(${this.closeImg});
+				width: 12px;
+				height: 12px;
+				background: transparent url(${this.closeImg}); 
+				background-size: cover; 
+				transition: opacity .1s ease-in-out; 
 				cursor: pointer;
+				margin-right: 10px;
+			}
+			.quote-close:hover {
+				opacity: 1;
 			}
 			.delete-msg-btn {
-				opacity: .3;
+				opacity: .4;
 				float: right;
 				width: 16px;
 				height: 16px;
 				background-size: 16px 16px;
 				background-image: url(${this.deleteMsgBtnImg});
 				cursor: pointer;
+				transition: opacity 200ms ease-in-out;
+				-webkit-transition: opacity 200ms ease-in-out;
+			}
+			.delete-msg-btn:hover {
+				opacity: 1;
 			}`;
 		this.componentToHex = (c) => {
 			var hex = Number(c).toString(16);
@@ -118,7 +128,7 @@ class Citador {
 					this.stop();
 					BdApi.getCore().alert(self.getName(), self.invalidToken[0]);
 					this.log(self.invalidToken[1], "error");
-				} else { // se não tiver nenhuma guild, o token será válido de qualquer maneira, né?
+				} else { // in case there's no guild, the token will be also valid, isn't it?
 					this.log(self.validToken, "debug");
 				}
 			}
@@ -176,9 +186,15 @@ class Citador {
 									$('.quote-msg').find('.citar-btn').toggleClass('quoting');
 									$('.quote-msg').find('.citar-btn').text(self.quotingMsg);
 									
-									if ($('.quote-msg').find('.embed').length >= 1) {
-										$('.quote-msg').find('.accessory').remove();
-									}
+									$('.quote-msg').find('.embed').each(function() {
+										$(this).closest('.accessory').remove();
+									});
+									
+									$('.quote-msg').find('.markup').each(function() {
+										if ($(this).text() == "" && $(this).closest(".message").find('.accessory').length == 0) {
+											$(this).closest('.message-text').remove();
+										}
+									});
 
 									// testar se é um canal privado ou canal de servidor
 									if ($('.chat .title-wrap .title.channel-group-dm .channel-name').length >= 1) {
@@ -201,22 +217,15 @@ class Citador {
 										self.cancelQuote();
 									});
 									
-									if ($('.quote-msg').find('.markup').length == 1 && $('.quote-msg').find('.markup').text() == "" && $('.quote-msg').find('.accessory').length !== 1) {
-										self.cancelQuote();
-									}
-									
 									// define a função de clique, pra deletar uma mensagem que você não deseja citar
 									$('.quote-msg').find('.delete-msg-btn')
 										.click(function() {
-											$('.quote-msg').find('.message').has(this).find('.accessory').fadeOut(50, () => { 
-												$('.quote-msg').find('.message').has(this).find('.accessory').remove();
-											});
-											$('.quote-msg').find('.message').has(this).find('.message-text').fadeOut(50, () => { 
-												$('.quote-msg').find('.message').has(this).find('.message-text').remove();
-												if ($('.quote-msg').find('.message-text').length == 0) {
-													self.cancelQuote();
-												}
-											});
+											$('.quote-msg').find('.message').has(this).find('.accessory').remove();
+											$('.quote-msg').find('.message').has(this).find('.message-text').remove();
+											deleteTooltip.remove();
+											if ($('.quote-msg').find('.message-text').length == 0) {
+												self.cancelQuote();
+											}
 										})
 										.on('mouseover.citador', function() {
 											$(".tooltips").append(deleteTooltip);
