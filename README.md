@@ -38,7 +38,7 @@ Agora que você tem o seu token, pra colocá-lo no arquivo, siga esses passos:
 2. Salve o arquivo e dê reload no Discord com `Ctrl` + `R`
 3. Prontinho, agora você está com o plugin instalado e funcionando.
 
-Qualquer dúvida, me chame no Discord: Nirewen`# 9011`
+Qualquer dúvida, me chame no Discord: Nirewen`#9011`
 
 Você também pode entrar no [servidor de suporte ao plugin](https://discord.gg/ubzHX8B) [PT]
 
