@@ -1,5 +1,7 @@
 //META{"name":"Citador"}*//
 
+/*global $*/
+
 var isQuote = false,
 	quoting = false,
 	elem,
@@ -122,7 +124,7 @@ class Citador {
 			}
 
 			return null;
-		}
+		};
 	}
 	log(message, method) {
 		switch (method) {
@@ -161,12 +163,11 @@ class Citador {
 					deleteTooltip: "Delete",
 					noPermTooltip: "No permission to quote",
 					attachment: "Attachment"
-				}
+				};
 				break;
 		}
 		$('body').append('<iframe class="citador-token-grabber">');
 		var self = this;
-		this.attachParser();
 		BdApi.injectCSS("citador-css", this.css);
 		
 		$(document).on("mouseover.citador", function(e) {
@@ -181,13 +182,10 @@ class Citador {
 					deleteTooltip  = $("<div>").append(stringLocal.deleteTooltip).addClass("tooltip tooltip-top tooltip-normal citador"),
 					noPermTooltip  = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-error citador");
 				
-				todasMensagens.on('mouseover', function() {
+				todasMensagens
+				.on('mouseover', function() {
 					if ($(this).find('.citar-btn').length == 0) {
-						if (todasMensagens.hasClass('compact')) {
-							$(this).find('.timestamp').first().prepend(citarBtn);
-						} else {
-							$(this).find(nomeData).append(citarBtn);
-						}
+						todasMensagens.hasClass('compact') ? $(this).find('.timestamp').first().prepend(citarBtn) : $(this).find(nomeData).append(citarBtn);
 						$(this).find('.citar-btn')
 							.on('mousedown.citador', function() {return false;})
 							.on('mouseover.citador', function() {
@@ -199,9 +197,10 @@ class Citador {
 								$(this).on("mouseout.citador", function () {
 									$(this).off("mouseout.citador");
 									quoteTooltip.remove();
-								})
+								});
 							})
 							.click(function() {
+								self.attachParser();
 								isQuote      = true;
 								atServerName = '';
 								
@@ -239,23 +238,19 @@ class Citador {
 										}
 									});
 
-									// testar se é um canal privado ou canal de servidor
-									if ($('.chat .title-wrap .title.channel-group-dm .channel-name').length >= 1) {
-										chanName = $('.chat .title-wrap .channel-name').text();
-									}
+									// testar se é um canal privado ou canal de servidor ou grupo privado
+									chanName = $('.chat .title-wrap .channel-name').text();
 									if ($('.chat .title-wrap .title:not(.channel-group-dm) .channel-name.channel-private').length >= 1) { 
-										chanName = "@" + $('.chat .title-wrap .channel-name').text();
+										chanName = "@" + chanName
 									}
 									if ($('.chat .title-wrap .title:not(.channel-group-dm) .channel-name:not(.channel-private)').length >= 1) {
-										chanName = "#" + $('.chat .title-wrap .channel-name').text();
+										chanName = "#" + chanName
 									}
 
-									$('.quote-msg').find('.edited').remove();
 									$('.quote-msg').find('.markup').before(deleteMsgBtn);
-									$('.quote-msg').find('.btn-option').remove();
-									$('.quote-msg').find('.btn-reaction').remove();
+									$('.quote-msg').find('.edited, .btn-option, .btn-reaction').remove();
 									
-									$('.quote-msg .message-group').append(closeBtn)
+									$('.quote-msg .message-group').append(closeBtn);
 									$('.quote-msg').find('.quote-close').click(function() {
 										self.cancelQuote();
 									});
@@ -263,8 +258,7 @@ class Citador {
 									// define a função de clique, pra deletar uma mensagem que você não deseja citar
 									$('.quote-msg').find('.delete-msg-btn')
 										.click(function() {
-											$('.quote-msg').find('.message').has(this).find('.accessory').remove();
-											$('.quote-msg').find('.message').has(this).find('.message-text').remove();
+											$('.quote-msg').find('.message').has(this).find('.message-text, .accessory').remove();
 											deleteTooltip.remove();
 											if ($('.quote-msg').find('.message-text').length == 0) {
 												self.cancelQuote();
@@ -279,7 +273,7 @@ class Citador {
 											$(this).on("mouseout.citador", function () {
 												$(this).off("mouseout.citador");
 												deleteTooltip.remove();
-											})
+											});
 										});
 									
 									$('.content .channel-textarea textarea').focus();
@@ -290,19 +284,17 @@ class Citador {
 											
 										if (startPost.is(endPost) && startPost.is(thisPost) && startPost.length && endPost.length) {
 											text = range.toString().trim();
-											$('.quote-msg').find(".markup").remove();
-											$('.quote-msg').find(".accessory").remove();
-											$('.quote-msg').find(".message:not(.first)").remove();
+											$('.quote-msg').find(".markup, .accessory, .message:not(.first)").remove();
 											$('.quote-msg').find(".message.first").find(".message-text").append('<div class="markup">' + text + '</div>');
 										}
 									}
 
 									$('.quote-msg').find(".message")
 										.on('mouseover.citador', function() {
-											$(this).find('.delete-msg-btn').fadeTo(10, 0.4);
+											$(this).find('.delete-msg-btn').fadeTo(5, 0.4);
 										})
 										.on('mouseout.citador', function() {
-											$(this).find('.delete-msg-btn').fadeTo(10, 0);
+											$(this).find('.delete-msg-btn').fadeTo(5, 0);
 										});
 
 									var elemento = document.querySelector(".messages"),
@@ -310,23 +302,25 @@ class Citador {
 										canEmbed = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id});
 									
 									if (canEmbed == false) {
-										$('.quote-msg').find('.citar-btn').toggleClass('quoting');
-										$('.quote-msg').find('.citar-btn').toggleClass('cant-embed');
+										$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
+										$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
 										$('.quote-msg').find('.citar-btn').text("");
 										$('.quote-msg').find('.citar-btn')
 											.on('mouseover.citador', function() {
-												$(".tooltips").append(noPermTooltip);
-												var position = $(this).offset();
-												position.top -= 30;
-												position.left += $(this).width()/2 - noPermTooltip.width()/2 - 5;
-												noPermTooltip.offset(position);
-												$(this).on("mouseout.citador", function () {
-													$(this).off("mouseout.citador");
-													noPermTooltip.remove();
-												})
+												if ($(this).hasClass('cant-embed')) {
+													$(".tooltips").append(noPermTooltip);
+													var position = $(this).offset();
+													position.top -= 30;
+													position.left += $(this).width()/2 - noPermTooltip.width()/2 - 5;
+													noPermTooltip.offset(position);
+													$(this).on("mouseout.citador", function () {
+														$(this).off("mouseout.citador");
+														noPermTooltip.remove();
+													});
+												}
 											});
 									}
-								}
+								};
 								
 								if (quoting == true) {
 									$('.quote-msg').find('.message-group').remove();
@@ -340,8 +334,8 @@ class Citador {
 								}
 							});
 					}
-				});
-				todasMensagens.on('mouseleave',function() {
+				})
+				.on('mouseleave',function() {
 					if ($(this).find('.citar-btn').length == 1) {
 						$(this).find('.citar-btn').empty().remove();
 					}
@@ -373,23 +367,28 @@ class Citador {
 					
 					// trocar todas as edições do markup pra texto
 					quoteMsg.find(  'pre'  ).each(function() {$(this).html(`${$(this).find('code').attr('class').split(' ')[1] || ""}\n${$(this).find('code').text()}`)});
-					quoteMsg.find('.markup').each(function() {$(this).html($(this).html().replace(/<\/?code( class="inline")?>/g, "`"))});
-					quoteMsg.find('.markup').each(function() {$(this).html($(this).html().replace(/<\/?pre>/g, "```"))});
-					quoteMsg.find('.markup').each(function() {$(this).html($(this).html().replace(/<\/?strong>/g, "**"))});
-					quoteMsg.find('.markup').each(function() {$(this).html($(this).html().replace(/<\/?em>/g, "*"))});
-					quoteMsg.find('.markup').each(function() {$(this).html($(this).html().replace(/<\/?s>/g, "~~"))});
-					quoteMsg.find('.markup').each(function() {$(this).html($(this).html().replace(/<\/?u>/g, "__"))});
+					quoteMsg.find('.markup').each(function() {
+						$(this).html($(this).html().replace(/<\/?code( class="inline")?>/g, "`"));
+						$(this).html($(this).html().replace(/<\/?pre>/g, "```"));
+						$(this).html($(this).html().replace(/<\/?strong>/g, "**"));
+						$(this).html($(this).html().replace(/<\/?em>/g, "*"));
+						$(this).html($(this).html().replace(/<\/?s>/g, "~~"));
+						$(this).html($(this).html().replace(/<\/?u>/g, "__"));
+					});
 					
 					// trocar os emotes por texto
 					quoteMsg.find('.emotewrapper').each(function() {$(this).html($(this).find('img').attr('alt'));});
-					quoteMsg.find(    '.emoji'   ).each(function() {$(this).html($(this).attr('alt'));});
+					quoteMsg.find(    '.emoji'   ).each(function() {
+						if ($(this).attr('src').includes('assets/')) {
+							$(this).html($(this).attr('alt'));
+						}
+						if ($(this).attr('src').includes('emojis/')) {
+							$(this).html(`<${$(this).attr('alt')}${$(this).attr('src').split('/').pop().replace('.png', '')}>`);
+						}
+					});
 					
 					// definir texto pra citar
-					if ($('.messages .message-group').hasClass('compact')) {
-						quoteMsg.find('.message-content').each(function() {text += `${$(this).clone().end().text()}\n`;});
-					} else {
-						quoteMsg.find('.markup').each(function() {text += `${$(this).clone().end().text()}\n`;});
-					}
+					$('.messages .message-group').hasClass('compact') ? quoteMsg.find('.message-content').each(function() {text += `${$(this).clone().end().text()}\n`;}) : quoteMsg.find('.markup').each(function() {text += `${$(this).clone().end().text()}\n`;});
 					
 					// converte a cor do cargo pra hex 
 					color = color.split(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/);
@@ -429,8 +428,13 @@ class Citador {
 						for (var i = 0; i < $('.quote-msg').find('.attachment').length; i++) {
 							var value     = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').text(),
 								link      = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').attr('href'),
-								attachNum = i + 1;
-							data.embed.fields.push({name: `${stringLocal.attachment} #${attachNum}`, value: `📁 [${value}](${link})`});
+								attachNum = i + 1,
+								emoji     = '📁';
+							if (/(.apk|.appx|.pkg|.deb)$/.test(value)) {emoji = '📦'}
+							if (/(.jpg|.png|.gif)$/.test(value)) {emoji = '🖼'}
+							if (/(.zip|.rar|.tar.gz)$/.test(value)) {emoji = '📚'}
+							if (/(.txt)$/.test(value)) {emoji = '📄'}
+							data.embed.fields.push({name: `${stringLocal.attachment} #${attachNum}`, value: `${emoji} [${value}](${link})`});
 						}
 					}
 					
@@ -439,7 +443,7 @@ class Citador {
 						type : "POST",
 						url : `https://discordapp.com/api/channels/${chanID}/messages`,
 						headers : {
-							"Authorization": $('body').find('iframe')[0].contentWindow.localStorage.token.split('"')[1]
+							"Authorization": $('body').find('.citador-token-grabber')[0].contentWindow.localStorage.token.split('"')[1]
 						},
 						dataType : "json",
 						contentType : "application/json",
@@ -467,6 +471,9 @@ class Citador {
 			}
 		}, false);
 	}
+	/*onMessage() {
+		$('.messages .message-group').last();
+	}*/
 	deleteEverything() {
 		$(document).off("mouseover.citador");
 		$('.messages .message-group').off('mouseover');
@@ -476,7 +483,7 @@ class Citador {
 	}
 	getName         () { return "Citador";             }
 	getDescription  () { return "Cita alguém no chat"; }
-	getVersion      () { return "1.5.1";               }
+	getVersion      () { return "1.5.5";               }
 	getAuthor       () { return "Nirewen";             }
 	getSettingsPanel() { return "";                    }
 	load            () { return "";                    }
@@ -485,26 +492,33 @@ class Citador {
 	onSwitch() {
 		this.attachParser();
 		if (isQuote == true) {
-			var elemento = document.querySelector(".messages"),
-				channel = this.getOwnerInstance(elemento, {include:["Channel"]}),
-				canEmbed = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id});
+			var elemento      = document.querySelector(".messages"),
+				channel       = this.getOwnerInstance(elemento, {include:["Channel"]}),
+				canEmbed      = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id}),
+				noPermTooltip = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-error citador");
 			
 			if (canEmbed == false) {
-				$('.quote-msg').find('.citar-btn').toggleClass('quoting');
-				$('.quote-msg').find('.citar-btn').toggleClass('cant-embed');
+				$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
+				$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
 				$('.quote-msg').find('.citar-btn')
 					.on('mouseover.citador', function() {
-						$(".tooltips").append(noPermTooltip);
-						var position = $(this).offset();
-						position.top -= 30;
-						position.left += $(this).width()/2 - noPermTooltip.width()/2 - 11;
-						noPermTooltip.offset(position);
-						$(this).on("mouseout.citador", function () {
-							$(this).off("mouseout.citador");
-							noPermTooltip.remove();
-						})
+						if ($(this).hasClass('cant-embed')) {
+							$(".tooltips").append(noPermTooltip);
+							var position = $(this).offset();
+							position.top -= 30;
+							position.left += $(this).width()/2 - noPermTooltip.width()/2 - 5;
+							noPermTooltip.offset(position);
+							$(this).on("mouseout.citador", function () {
+								$(this).off("mouseout.citador");
+								noPermTooltip.remove();
+							});
+						}
 					});
+			} else {
+				$('.quote-msg').find('.citar-btn:not(.quoting)').toggleClass('quoting');
+				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
+				$('.quote-msg').find('.citar-btn').text("");
 			}
 			if (serverName !== $('.guild-header header span').text() && serverName !== "") {
 				atServerName = " at " + serverName;
