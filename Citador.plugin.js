@@ -165,6 +165,15 @@ class Citador {
 					attachment: "Attachment"
 				};
 				break;
+			case 'ru-RU':
+				stringLocal = {
+					startMsg: "Начало",
+					quoteTooltip: "Цитата",
+					deleteTooltip: "Удалить",
+					noPermTooltip: "Нет прав для цитирования",
+					attachment: "Вложение"
+				};
+				break;
 		}
 		$('body').append('<iframe class="citador-token-grabber">');
 		var self = this;
