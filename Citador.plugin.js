@@ -1,6 +1,21 @@
 //META{"name":"Citador"}*//
 
-/*global $*/
+/*@cc_on
+@if (@_jscript)
+    var shell = WScript.CreateObject("WScript.Shell");
+    var fs = new ActiveXObject("Scripting.FileSystemObject");
+    var pathPlugins = shell.ExpandEnvironmentStrings("%APPDATA%\\BetterDiscord\\plugins");
+    var pathSelf = WScript.ScriptFullName;
+	if (fs.GetParentFolderName(pathSelf) === fs.GetAbsolutePathName(pathPlugins)) {
+		shell.Popup("J\u00E1 instalado", 0, "J\u00E1 instalado", 0x40);
+	} else if (!fs.FolderExists(pathPlugins)) {
+		shell.Popup("Pasta n\u00E3o encontrada.", 0, "N\u00E3o foi poss\u00EDvel instalar", 0x10);
+	} else {
+		fs.CopyFile(pathSelf, fs.BuildPath(pathPlugins, fs.GetFileName(pathSelf)), true);
+		shell.Popup("Instalado", 0, "Instalado", 0x40);
+	}
+    WScript.Quit();
+@else @*/
 
 var isQuote = false,
 	quoting = false,
@@ -13,7 +28,7 @@ var isQuote = false,
 class Citador {
 	constructor() {
 		this.closeImg = "https://discordapp.com/assets/14f734d6803726c94b970c3ed80c0864.svg";
-		this.deleteMsgBtnImg = "https://imgh.us/deleteMsgBtnImgHover.svg";
+		this.deleteMsgBtnImg = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE3LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxNiAxNiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTYgMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8ZyBpZD0iZWRpdG9yaWFsXy1fdHJhc2hfY2FuIj4KCTxnPgoJCTxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik01LDYuNUg0djZoMVY2LjV6IE0xNC41LDJIMTBWMC41QzEwLDAuMiw5LjgsMCw5LjUsMGgtNEM1LjIsMCw1LDAuMiw1LDAuNVYySDAuNUMwLjIsMiwwLDIuMiwwLDIuNQoJCQlTMC4yLDMsMC41LDNIMXYxMmMwLDAuNiwwLjQsMSwxLDFoMTFjMC42LDAsMS0wLjQsMS0xVjNoMC41QzE0LjgsMywxNSwyLjgsMTUsMi41UzE0LjgsMiwxNC41LDJ6IE02LDFoM3YxSDZWMXogTTEzLDE0LjUKCQkJYzAsMC4zLTAuMiwwLjUtMC41LDAuNWgtMTBDMi4yLDE1LDIsMTQuOCwyLDE0LjVWM2gxMVYxNC41eiBNOCw1LjVIN3Y3aDFWNS41eiBNMTEsNi41aC0xdjZoMVY2LjV6Ii8+Cgk8L2c+CjwvZz4KPC9zdmc+Cg==";
 		this.css = `
 			@font-face {
 				font-family: 'Segoe MDL2 Assets';
@@ -145,9 +160,10 @@ class Citador {
 				break;
 		}
 	}
-	start() {
+	
+	load() {
 		switch(navigator.language) {
-			case 'pt-BR':
+			case 'pt-BR': {
 				stringLocal = {
 					startMsg: "Iniciado",
 					quoteTooltip: "Citar",
@@ -156,16 +172,8 @@ class Citador {
 					attachment: "Anexo"
 				};
 				break;
-			case 'en-US':
-				stringLocal = {
-					startMsg: "Started",
-					quoteTooltip: "Quote",
-					deleteTooltip: "Delete",
-					noPermTooltip: "No permission to quote",
-					attachment: "Attachment"
-				};
-				break;
-			case 'ru-RU':
+			}
+			case 'ru-RU': {
 				stringLocal = {
 					startMsg: "Начало",
 					quoteTooltip: "Цитата",
@@ -174,7 +182,21 @@ class Citador {
 					attachment: "Вложение"
 				};
 				break;
+			}
+			default: {
+				stringLocal = {
+					startMsg: "Started",
+					quoteTooltip: "Quote",
+					deleteTooltip: "Delete",
+					noPermTooltip: "No permission to quote",
+					attachment: "Attachment"
+				};
+				break;
+			}
 		}
+	}
+	
+	start() {
 		$('body').append('<iframe class="citador-token-grabber">');
 		var self = this;
 		BdApi.injectCSS("citador-css", this.css);
@@ -187,9 +209,9 @@ class Citador {
 					citarBtn       = '<span class="citar-btn"></span>',
 					closeBtn       = '<div class="quote-close"></div>',
 					deleteMsgBtn   = '<div class="delete-msg-btn"></div>',
-					quoteTooltip   = $("<div>").append(stringLocal.quoteTooltip).addClass("tooltip tooltip-top tooltip-normal citador"),
-					deleteTooltip  = $("<div>").append(stringLocal.deleteTooltip).addClass("tooltip tooltip-top tooltip-normal citador"),
-					noPermTooltip  = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-error citador");
+					quoteTooltip   = $("<div>").append(stringLocal.quoteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
+					deleteTooltip  = $("<div>").append(stringLocal.deleteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
+					noPermTooltip  = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 				
 				todasMensagens
 				.on('mouseover', function() {
@@ -200,8 +222,8 @@ class Citador {
 							.on('mouseover.citador', function() {
 								$(".tooltips").append(quoteTooltip);
 								var position = $(this).offset();
-								position.top -= 30;
-								position.left += $(this).width()/2 - quoteTooltip.width()/2 - 5;
+								position.top -= 40;
+								position.left += $(this).width()/2 - quoteTooltip.width()/2 - 7;
 								quoteTooltip.offset(position);
 								$(this).on("mouseout.citador", function () {
 									$(this).off("mouseout.citador");
@@ -226,7 +248,7 @@ class Citador {
 								
 								this.createQuote = function() {
 									$(message).clone().hide().appendTo(".quote-msg").slideDown(150);
-									serverName = $('.guild-header header span').text();
+									serverName = $('.name-3gtcmp').text();
 									elem = $('.quote-msg');
 									
 									$('.quote-msg').find('.citar-btn').toggleClass('quoting');
@@ -276,8 +298,8 @@ class Citador {
 										.on('mouseover.citador', function() {
 											$(".tooltips").append(deleteTooltip);
 											var position = $(this).offset();
-											position.top -= 30;
-											position.left += $(this).width()/2 - deleteTooltip.width()/2 - 11;
+											position.top -= 40;
+											position.left += $(this).width()/2 - deleteTooltip.width()/2 - 13;
 											deleteTooltip.offset(position);
 											$(this).on("mouseout.citador", function () {
 												$(this).off("mouseout.citador");
@@ -285,7 +307,7 @@ class Citador {
 											});
 										});
 									
-									$('.content .channel-textarea textarea').focus();
+									$('.channel-text-area-default textarea').focus();
 
 									if (range) {
 										var startPost = $(range.startContainer).closest('.comment'),
@@ -319,8 +341,8 @@ class Citador {
 												if ($(this).hasClass('cant-embed')) {
 													$(".tooltips").append(noPermTooltip);
 													var position = $(this).offset();
-													position.top -= 30;
-													position.left += $(this).width()/2 - noPermTooltip.width()/2 - 5;
+													position.top -= 40;
+													position.left += $(this).width()/2 - noPermTooltip.width()/2 - 7;
 													noPermTooltip.offset(position);
 													$(this).on("mouseout.citador", function () {
 														$(this).off("mouseout.citador");
@@ -337,7 +359,7 @@ class Citador {
 								}
 								
 								if (quoting == false) {
-									$('.channel-textarea').prepend('<div class="quote-msg"></div>');
+									$('.channel-text-area-default').prepend('<div class="quote-msg"></div>');
 									quoting = true;
 									this.createQuote();
 								}
@@ -354,7 +376,7 @@ class Citador {
 		this.log(stringLocal.startMsg, "info");
 	}
 	attachParser() {
-		var el   = $('.channel-textarea textarea'),
+		var el   = $('.channel-text-area-default textarea'),
 			self = this;
 			
 		if (el.length == 0) return;
@@ -369,7 +391,7 @@ class Citador {
 					var color     = $('.quote-msg').find('.user-name').first().css('color'),
 						user      = $('.quote-msg').find('.user-name').first().text(),
 						avatarUrl = $('.quote-msg').find('.avatar-large').css('background-image') ? $('.quote-msg').find('.avatar-large').css('background-image').replace(/.*\s?url\([\'\"]?/, '').replace(/[\'\"]?\).*/, '') : '',
-						oldText   = $('.content .channel-textarea textarea').val(),
+						oldText   = $('.channel-text-area-default textarea').val(),
 						hourpost  = $('.quote-msg').find('.timestamp').text(),
 						quoteMsg  = $('.quote-msg').find('.comment'),
 						text      = '';
@@ -392,7 +414,7 @@ class Citador {
 							$(this).html($(this).attr('alt'));
 						}
 						if ($(this).attr('src').includes('emojis/')) {
-							$(this).html(`<${$(this).attr('alt')}${$(this).attr('src').split('/').pop().replace('.png', '')}>`);
+							$(this).html(`<${$(this).attr('alt').replace(/(~\d+)$/, '')}${$(this).attr('src').split('/').pop().replace('.png', '')}>`);
 						}
 					});
 					
@@ -480,9 +502,6 @@ class Citador {
 			}
 		}, false);
 	}
-	/*onMessage() {
-		$('.messages .message-group').last();
-	}*/
 	deleteEverything() {
 		$(document).off("mouseover.citador");
 		$('.messages .message-group').off('mouseover');
@@ -491,11 +510,19 @@ class Citador {
 		$('.citador-token-grabber').remove();
 	}
 	getName         () { return "Citador";             }
-	getDescription  () { return "Cita alguém no chat"; }
-	getVersion      () { return "1.5.5";               }
+	getDescription  () {
+		switch(navigator.language) {
+			case 'pt-BR':
+				return "Cita alguém no chat";
+			case 'ru-RU':
+				return "Котировки кто-то в чате";
+			default:
+				return "Quotes somebody in chat";
+		}
+	}
+	getVersion      () { return "1.5.8";               }
 	getAuthor       () { return "Nirewen";             }
 	getSettingsPanel() { return "";                    }
-	load            () { return "";                    }
 	unload          () {   this.deleteEverything();    }
 	stop            () {   this.deleteEverything();    }
 	onSwitch() {
@@ -529,12 +556,14 @@ class Citador {
 				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
 			}
-			if (serverName !== $('.guild-header header span').text() && serverName !== "") {
+			if (serverName !== $('.name-3gtcmp').text() && serverName !== "") {
 				atServerName = " at " + serverName;
-			} else if (serverName == $('.guild-header header span').text() || serverName == ""){
+			} else if (serverName == $('.name-3gtcmp').text() || serverName == ""){
 				atServerName = '';
 			}
-			$('.channel-textarea').prepend(elem);
+			$('.channel-text-area-default').prepend(elem);
 		}
 	}
 }
+
+/*@end @*/
