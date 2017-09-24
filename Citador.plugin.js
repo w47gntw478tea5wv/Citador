@@ -54,7 +54,7 @@ class Citador {
 			}
 		};
 		
-		var closeImg = "https://discordapp.com/assets/14f734d6803726c94b970c3ed80c0864.svg";
+		var closeImg = "https://discordapp.com/assets/14f734d6803726c94b970c3ed80c0864.svg",
 			deleteMsgBtnImg = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE3LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxNiAxNiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTYgMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8ZyBpZD0iZWRpdG9yaWFsXy1fdHJhc2hfY2FuIj4KCTxnPgoJCTxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik01LDYuNUg0djZoMVY2LjV6IE0xNC41LDJIMTBWMC41QzEwLDAuMiw5LjgsMCw5LjUsMGgtNEM1LjIsMCw1LDAuMiw1LDAuNVYySDAuNUMwLjIsMiwwLDIuMiwwLDIuNQoJCQlTMC4yLDMsMC41LDNIMXYxMmMwLDAuNiwwLjQsMSwxLDFoMTFjMC42LDAsMS0wLjQsMS0xVjNoMC41QzE0LjgsMywxNSwyLjgsMTUsMi41UzE0LjgsMiwxNC41LDJ6IE02LDFoM3YxSDZWMXogTTEzLDE0LjUKCQkJYzAsMC4zLTAuMiwwLjUtMC41LDAuNWgtMTBDMi4yLDE1LDIsMTQuOCwyLDE0LjVWM2gxMVYxNC41eiBNOCw1LjVIN3Y3aDFWNS41eiBNMTEsNi41aC0xdjZoMVY2LjV6Ii8+Cgk8L2c+CjwvZz4KPC9zdmc+Cg==";
 		
 		this.css = `
@@ -185,6 +185,7 @@ class Citador {
 			
 		this.quoteProps.messages.forEach(m => m.deleted = null);
 		this.quoteProps = null;
+		this.selectionP = null;
 	}
 	
 	start() {
@@ -227,17 +228,15 @@ class Citador {
 								var message  = $(this).parents('.message-group'),
 									mInstance = self.getOwnerInstance($(".messages")[0]),
 									channel = mInstance.props.channel,
-									text,
 									range;
 								
 								self.quoteProps = $.extend(true, {}, self.getOwnerInstance(message[0]).props);
 									
-								// TODO: FIX THAT SHIT
-								/*if (window.getSelection && window.getSelection().rangeCount > 0) {
+								if (window.getSelection && window.getSelection().rangeCount > 0) {
 									range = window.getSelection().getRangeAt(0);
 								} else if (document.selection && document.selection.type !== 'Control') {
 									range = document.selection.createRange();
-								}*/
+								}
 								var thisPost = $(this).closest('.comment');
 								
 								this.createQuote = function() {
@@ -273,15 +272,16 @@ class Citador {
 									// define a função de clique, pra deletar uma mensagem que você não deseja citar
 									$('.quote-msg').find('.delete-msg-btn')
 										.click(function() {
-											var deleteMsg = $('.quote-msg').find('.message').has(this),
-												deleteI   = $('.quote-msg').find('.message').index(deleteMsg);
-											
-											deleteMsg.find('.message-text, .accessory').hide();
-											deleteTooltip.remove();
-											
-											self.quoteProps.messages[deleteI].deleted = true;
-											if (self.quoteProps.messages.filter(m => !m.deleted).length < 1) {
+											if(self.quoteProps.messages.filter(m => !m.deleted).length < 2) {
 												self.cancelQuote();
+											} else {
+												var deleteMsg = $('.quote-msg .message').has(this),
+													deleteI   = $('.quote-msg .message').index(deleteMsg);
+											
+												deleteMsg.find('.message-text, .accessory').hide();
+												deleteTooltip.remove();
+											
+												self.quoteProps.messages[deleteI].deleted = true;
 											}
 										})
 										.on('mouseover.citador', function() {
@@ -298,18 +298,32 @@ class Citador {
 									
 									$('.channel-text-area-default textarea').focus();
 
-									// TODO: FIX THAT SHIT
-									/*if (range) {
-										console.log(range)
-										var startPost = $(range.startContainer).closest('.comment'),
-											endPost   = $(range.endContainer).closest('.comment');
+									if (range) {
+										var startPost = $(range.startContainer).closest('.message'),
+											endPost   = $(range.endContainer).closest('.message');
 											
-										if (startPost.is(endPost) && startPost.is(thisPost) && startPost.length && endPost.length) {
-											text = range.toString().trim();
-											$('.quote-msg').find(".markup, .accessory, .message:not(.first)").remove();
-											$('.quote-msg').find(".message.first").find(".message-text").append('<div class="markup">' + text + '</div>');
+										if (thisPost.has(startPost) && thisPost.has(endPost) && startPost.length && endPost.length) {
+											var startI   = thisPost.find(".message").index(startPost),
+												endI     = thisPost.find(".message").index(endPost);
+											
+											self.selectionP = {
+												start: {
+													index: startI,
+													offset: range.startOffset
+												},
+												end: {
+													index: endI,
+													offset: range.endOffset
+												}
+											};
+											
+											self.quoteProps.messages.forEach((m, i) => {
+												if(i == startI) $($('.quote-msg .message')[i]).find(".markup").text(m.content.substring(range.startOffset))
+												if(i == endI) $($('.quote-msg .message')[i]).find(".markup").text(m.content.substring(range.startOffset, range.endOffset))
+												if(i < startI || i > endI) $($('.quote-msg .message')[i]).hide();
+											});
 										}
-									}*/
+									}
 
 									$('.quote-msg').find(".message")
 										.on('mouseover.citador', function() {
@@ -374,7 +388,6 @@ class Citador {
 			if (code !== 13) return;
 			try {
 				var props = self.quoteProps;
-				console.log(props)
 				if (props) {
 					if (e.shiftKey || $('.channel-textarea-autocomplete-inner').length >= 1) return;
 		
@@ -388,9 +401,25 @@ class Citador {
 						author    = msg.author,
 						color     = Number(`0x${msg.colorString.slice(1)}`),
 						oldText   = $('.channel-text-area-default textarea').val(),
-						text      = messages.map(m => m.content).join('\n'),
+						text      = '',
 						atServer  = msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
 						chName    = msgC.isPrivate() ? `@${msgC._getUsers()[0].username}` : `#${msgC.name}`;
+					
+					if(self.selectionP) {
+						var start = self.selectionP.start,
+							end = self.selectionP.end;
+						
+						props.messages.forEach((m, i) => {
+							if(!m.deleted) {
+								var endText = m.content;
+								if(i == start.index) endText = m.content.substring(start.offset);
+								if(i == end.index) endText = m.content.substring(start.offset, end.offset);
+								if(i >= start.index && i <= end.index) text += `${endText}\n`;
+							}
+						});
+					} else {
+						text = messages.map(m => m.content).join('\n');
+					}					
 					
 					// os dados do embed 
 					var data = {
@@ -411,7 +440,6 @@ class Citador {
 
 					
 					var attachments = messages.map(m => m.attachments).reduce((a, b) => a.concat(b));
-					console.log(attachments);
 					if (attachments.length >= 1) {
 						// checar se tem alguma imagem na mensagem citada, e adicionar ao embed final
 						var imgAt = attachments.filter(a => a.width);
