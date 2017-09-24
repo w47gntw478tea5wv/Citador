@@ -17,18 +17,46 @@
     WScript.Quit();
 @else @*/
 
-var isQuote = false,
-	quoting = false,
-	elem,
-	chanName,
-	serverName,
-	atServerName,
-	stringLocal;
-
 class Citador {
 	constructor() {
-		this.closeImg = "https://discordapp.com/assets/14f734d6803726c94b970c3ed80c0864.svg";
-		this.deleteMsgBtnImg = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE3LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxNiAxNiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTYgMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8ZyBpZD0iZWRpdG9yaWFsXy1fdHJhc2hfY2FuIj4KCTxnPgoJCTxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik01LDYuNUg0djZoMVY2LjV6IE0xNC41LDJIMTBWMC41QzEwLDAuMiw5LjgsMCw5LjUsMGgtNEM1LjIsMCw1LDAuMiw1LDAuNVYySDAuNUMwLjIsMiwwLDIuMiwwLDIuNQoJCQlTMC4yLDMsMC41LDNIMXYxMmMwLDAuNiwwLjQsMSwxLDFoMTFjMC42LDAsMS0wLjQsMS0xVjNoMC41QzE0LjgsMywxNSwyLjgsMTUsMi41UzE0LjgsMiwxNC41LDJ6IE02LDFoM3YxSDZWMXogTTEzLDE0LjUKCQkJYzAsMC4zLTAuMiwwLjUtMC41LDAuNWgtMTBDMi4yLDE1LDIsMTQuOCwyLDE0LjVWM2gxMVYxNC41eiBNOCw1LjVIN3Y3aDFWNS41eiBNMTEsNi41aC0xdjZoMVY2LjV6Ii8+Cgk8L2c+CjwvZz4KPC9zdmc+Cg==";
+		this.locals = {
+			'pt-BR': {
+				description: "Cita alguém no chat",
+				startMsg: "Iniciado",
+				quoteTooltip: "Citar",
+				deleteTooltip: "Excluir",
+				noPermTooltip: "Sem permissão para citar",
+				attachment: "Anexo"
+			},
+			'ru-RU': {
+				description: "Котировки кто-то в чате",
+				startMsg: "Начало",
+				quoteTooltip: "Цитата",
+				deleteTooltip: "Удалить",
+				noPermTooltip: "Нет прав для цитирования",
+				attachment: "Вложение"
+			},
+			'ja': {
+				description: "誰かをチャットで引用します",
+				startMsg: "起動完了",
+				quoteTooltip: "引用",
+				deleteTooltip: "削除",
+				noPermTooltip: "引用する権限がありません",
+				attachment: "添付ファイル"
+			},
+			'default': {
+				description: "Quotes somebody in chat",
+				startMsg: "Started",
+				quoteTooltip: "Quote",
+				deleteTooltip: "Delete",
+				noPermTooltip: "No permission to quote",
+				attachment: "Attachment"
+			}
+		};
+		
+		var closeImg = "https://discordapp.com/assets/14f734d6803726c94b970c3ed80c0864.svg";
+			deleteMsgBtnImg = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE3LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxNiAxNiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTYgMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8ZyBpZD0iZWRpdG9yaWFsXy1fdHJhc2hfY2FuIj4KCTxnPgoJCTxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik01LDYuNUg0djZoMVY2LjV6IE0xNC41LDJIMTBWMC41QzEwLDAuMiw5LjgsMCw5LjUsMGgtNEM1LjIsMCw1LDAuMiw1LDAuNVYySDAuNUMwLjIsMiwwLDIuMiwwLDIuNQoJCQlTMC4yLDMsMC41LDNIMXYxMmMwLDAuNiwwLjQsMSwxLDFoMTFjMC42LDAsMS0wLjQsMS0xVjNoMC41QzE0LjgsMywxNSwyLjgsMTUsMi41UzE0LjgsMiwxNC41LDJ6IE02LDFoM3YxSDZWMXogTTEzLDE0LjUKCQkJYzAsMC4zLTAuMiwwLjUtMC41LDAuNWgtMTBDMi4yLDE1LDIsMTQuOCwyLDE0LjVWM2gxMVYxNC41eiBNOCw1LjVIN3Y3aDFWNS41eiBNMTEsNi41aC0xdjZoMVY2LjV6Ii8+Cgk8L2c+CjwvZz4KPC9zdmc+Cg==";
+		
 		this.css = `
 			@font-face {
 				font-family: 'Segoe MDL2 Assets';
@@ -66,7 +94,7 @@ class Citador {
 				float: right;
 				width: 12px;
 				height: 12px;
-				background: transparent url(${this.closeImg}); 
+				background: transparent url(${closeImg}); 
 				background-size: cover; 
 				transition: opacity .1s ease-in-out; 
 				cursor: pointer;
@@ -81,7 +109,7 @@ class Citador {
 				width: 16px;
 				height: 16px;
 				background-size: 16px 16px;
-				background-image: url(${this.deleteMsgBtnImg});
+				background-image: url(${deleteMsgBtnImg});
 				cursor: pointer;
 				transition: opacity 200ms ease-in-out;
 				-webkit-transition: opacity 200ms ease-in-out;
@@ -89,20 +117,7 @@ class Citador {
 			.delete-msg-btn:hover {
 				opacity: 1 !important;
 			}`;
-		this.componentToHex = (c) => {
-			var hex = Number(c).toString(16);
-			return hex.length == 1 ? "0" + hex : hex;
-		};
-		this.rgbToHex = (r, g, b) => {
-			return this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
-		};
-		this.cancelQuote = () => {
-			$('.quote-msg').slideUp(150, () => { $('.quote-msg').remove() });
-			$('.tooltip.citador').remove();
-			isQuote      = false; 
-			quoting      = false;
-			atServerName = '';
-		};
+		
 		this.getInternalInstance = e => e[Object.keys(e).find(k => k.startsWith("__reactInternalInstance"))];
 		this.getOwnerInstance = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
 			if (e === undefined) {
@@ -141,6 +156,7 @@ class Citador {
 			return null;
 		};
 	}
+	
 	log(message, method) {
 		switch (method) {
 			case "warn":
@@ -161,49 +177,14 @@ class Citador {
 		}
 	}
 	
-	load() {
-		switch(navigator.language) {
-			case 'pt-BR': {
-				stringLocal = {
-					startMsg: "Iniciado",
-					quoteTooltip: "Citar",
-					deleteTooltip: "Excluir",
-					noPermTooltip: "Sem permissão para citar",
-					attachment: "Anexo"
-				};
-				break;
-			}
-			case 'ru-RU': {
-				stringLocal = {
-					startMsg: "Начало",
-					quoteTooltip: "Цитата",
-					deleteTooltip: "Удалить",
-					noPermTooltip: "Нет прав для цитирования",
-					attachment: "Вложение"
-				};
-				break;
-			}
-			case 'ja': {
-				stringLocal = {
-					startMsg: "起動完了",
-					quoteTooltip: "引用",
-					deleteTooltip: "削除",
-					noPermTooltip: "引用する権限がありません",
-					attachment: "添付ファイル"
-				};
-				break;
-			}
-			default: {
-				stringLocal = {
-					startMsg: "Started",
-					quoteTooltip: "Quote",
-					deleteTooltip: "Delete",
-					noPermTooltip: "No permission to quote",
-					attachment: "Attachment"
-				};
-				break;
-			}
-		}
+	cancelQuote() {
+		$('.quote-msg').slideUp(150, () => { $('.quote-msg').remove() });
+		$('.tooltip.citador').remove();
+			
+		this.quoteMsg   = null;
+			
+		this.quoteProps.messages.forEach(m => m.deleted = null);
+		this.quoteProps = null;
 	}
 	
 	start() {
@@ -219,9 +200,9 @@ class Citador {
 					citarBtn       = '<span class="citar-btn"></span>',
 					closeBtn       = '<div class="quote-close"></div>',
 					deleteMsgBtn   = '<div class="delete-msg-btn"></div>',
-					quoteTooltip   = $("<div>").append(stringLocal.quoteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
-					deleteTooltip  = $("<div>").append(stringLocal.deleteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
-					noPermTooltip  = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
+					quoteTooltip   = $("<div>").append(self.getLocal().quoteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
+					deleteTooltip  = $("<div>").append(self.getLocal().deleteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
+					noPermTooltip  = $("<div>").append(self.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 				
 				todasMensagens
 				.on('mouseover', function() {
@@ -242,24 +223,26 @@ class Citador {
 							})
 							.click(function() {
 								self.attachParser();
-								isQuote      = true;
-								atServerName = '';
 								
 								var message  = $(this).parents('.message-group'),
+									mInstance = self.getOwnerInstance($(".messages")[0]),
+									channel = mInstance.props.channel,
 									text,
 									range;
+								
+								self.quoteProps = $.extend(true, {}, self.getOwnerInstance(message[0]).props);
 									
-								if (window.getSelection && window.getSelection().rangeCount > 0) {
+								// TODO: FIX THAT SHIT
+								/*if (window.getSelection && window.getSelection().rangeCount > 0) {
 									range = window.getSelection().getRangeAt(0);
 								} else if (document.selection && document.selection.type !== 'Control') {
 									range = document.selection.createRange();
-								}
+								}*/
 								var thisPost = $(this).closest('.comment');
 								
 								this.createQuote = function() {
-									$(message).clone().hide().appendTo(".quote-msg").slideDown(150);
-									serverName = $('.name-3gtcmp').text();
-									elem = $('.quote-msg');
+									var messageElem = $(message).clone().hide().appendTo(".quote-msg");
+									self.quoteMsg = $(".quote-msg");
 									
 									$('.quote-msg').find('.citar-btn').toggleClass('quoting');
 									$('.quote-msg').find('.citar-btn').text('');
@@ -279,15 +262,6 @@ class Citador {
 										}
 									});
 
-									// testar se é um canal privado ou canal de servidor ou grupo privado
-									chanName = $('.chat .title-wrap .channel-name').text();
-									if ($('.chat .title-wrap .title:not(.channel-group-dm) .channel-name.channel-private').length >= 1) { 
-										chanName = "@" + chanName
-									}
-									if ($('.chat .title-wrap .title:not(.channel-group-dm) .channel-name:not(.channel-private)').length >= 1) {
-										chanName = "#" + chanName
-									}
-
 									$('.quote-msg').find('.markup').before(deleteMsgBtn);
 									$('.quote-msg').find('.edited, .btn-option, .btn-reaction').remove();
 									
@@ -299,9 +273,14 @@ class Citador {
 									// define a função de clique, pra deletar uma mensagem que você não deseja citar
 									$('.quote-msg').find('.delete-msg-btn')
 										.click(function() {
-											$('.quote-msg').find('.message').has(this).find('.message-text, .accessory').remove();
+											var deleteMsg = $('.quote-msg').find('.message').has(this),
+												deleteI   = $('.quote-msg').find('.message').index(deleteMsg);
+											
+											deleteMsg.find('.message-text, .accessory').hide();
 											deleteTooltip.remove();
-											if ($('.quote-msg').find('.message-text').length == 0) {
+											
+											self.quoteProps.messages[deleteI].deleted = true;
+											if (self.quoteProps.messages.filter(m => !m.deleted).length < 1) {
 												self.cancelQuote();
 											}
 										})
@@ -319,7 +298,9 @@ class Citador {
 									
 									$('.channel-text-area-default textarea').focus();
 
-									if (range) {
+									// TODO: FIX THAT SHIT
+									/*if (range) {
+										console.log(range)
 										var startPost = $(range.startContainer).closest('.comment'),
 											endPost   = $(range.endContainer).closest('.comment');
 											
@@ -328,7 +309,7 @@ class Citador {
 											$('.quote-msg').find(".markup, .accessory, .message:not(.first)").remove();
 											$('.quote-msg').find(".message.first").find(".message-text").append('<div class="markup">' + text + '</div>');
 										}
-									}
+									}*/
 
 									$('.quote-msg').find(".message")
 										.on('mouseover.citador', function() {
@@ -338,11 +319,8 @@ class Citador {
 											$(this).find('.delete-msg-btn').fadeTo(5, 0);
 										});
 
-									var elemento = document.querySelector(".messages"),
-										channel = self.getOwnerInstance(elemento, {include:["Channel"]}),
-										canEmbed = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id});
-									
-									if (canEmbed == false) {
+									var canEmbed = channel.isPrivate() || mInstance.can(0x4800, {channelId: channel.id});
+									if (!canEmbed) {
 										$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
 										$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
 										$('.quote-msg').find('.citar-btn').text("");
@@ -361,18 +339,17 @@ class Citador {
 												}
 											});
 									}
+									
+									messageElem.slideDown(150);
 								};
 								
-								if (quoting == true) {
-									$('.quote-msg').find('.message-group').remove();
-									this.createQuote();
+								if ($('.quote-msg .message-group').length > 0) {
+									$('.quote-msg .message-group').remove();
+								} else {
+									$('.channel-text-area-default').prepend('<div class="quote-msg"></div>');
 								}
 								
-								if (quoting == false) {
-									$('.channel-text-area-default').prepend('<div class="quote-msg"></div>');
-									quoting = true;
-									this.createQuote();
-								}
+								this.createQuote();
 							});
 					}
 				})
@@ -383,8 +360,9 @@ class Citador {
 				});
 			}
 		});
-		this.log(stringLocal.startMsg, "info");
+		this.log(this.getLocal().startMsg, "info");
 	}
+	
 	attachParser() {
 		var el   = $('.channel-text-area-default textarea'),
 			self = this;
@@ -395,94 +373,72 @@ class Citador {
 			var code = e.keyCode || e.which;
 			if (code !== 13) return;
 			try {
-				if (isQuote == true) {
+				var props = self.quoteProps;
+				console.log(props)
+				if (props) {
 					if (e.shiftKey || $('.channel-textarea-autocomplete-inner').length >= 1) return;
-					
-					var color     = $('.quote-msg').find('.user-name').first().css('color'),
-						user      = $('.quote-msg').find('.user-name').first().text(),
-						avatarUrl = $('.quote-msg').find('.avatar-large').css('background-image') ? $('.quote-msg').find('.avatar-large').css('background-image').replace(/.*\s?url\([\'\"]?/, '').replace(/[\'\"]?\).*/, '') : '',
+		
+					var messages  = props.messages.filter(m => !m.deleted),
+						guilds    = self.getOwnerInstance($(".guilds.scroller")[0]).state.guilds.map(o => o.guild),
+						msg		  = props.messages[0],
+						cc        = self.getOwnerInstance($("form")[0]).props.channel,
+						msgC      = props.channel,
+						msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
+						
+						author    = msg.author,
+						color     = Number(`0x${msg.colorString.slice(1)}`),
 						oldText   = $('.channel-text-area-default textarea').val(),
-						hourpost  = $('.quote-msg').find('.timestamp').text(),
-						quoteMsg  = $('.quote-msg').find('.comment'),
-						text      = '';
-					
-					// trocar todas as edições do markup pra texto
-					quoteMsg.find(  'pre'  ).each(function() {$(this).html(`${$(this).find('code').attr('class').split(' ')[1] || ""}\n${$(this).find('code').text()}`)});
-					quoteMsg.find('.markup').each(function() {
-						$(this).html($(this).html().replace(/<\/?code( class="inline")?>/g, "`"));
-						$(this).html($(this).html().replace(/<\/?pre>/g, "```"));
-						$(this).html($(this).html().replace(/<\/?strong>/g, "**"));
-						$(this).html($(this).html().replace(/<\/?em>/g, "*"));
-						$(this).html($(this).html().replace(/<\/?s>/g, "~~"));
-						$(this).html($(this).html().replace(/<\/?u>/g, "__"));
-					});
-					
-					// trocar os emotes por texto
-					quoteMsg.find('.emotewrapper').each(function() {$(this).html($(this).find('img').attr('alt'));});
-					quoteMsg.find(    '.emoji'   ).each(function() {
-						if ($(this).attr('src').includes('assets/')) {
-							$(this).html($(this).attr('alt'));
-						}
-						if ($(this).attr('src').includes('emojis/')) {
-							$(this).html(`<${$(this).attr('alt').replace(/(~\d+)$/, '')}${$(this).attr('src').split('/').pop().replace('.png', '')}>`);
-						}
-					});
-					
-					// definir texto pra citar
-					$('.messages .message-group').hasClass('compact') ? quoteMsg.find('.message-content').each(function() {text += `${$(this).clone().end().text()}\n`;}) : quoteMsg.find('.markup').each(function() {text += `${$(this).clone().end().text()}\n`;});
-					
-					// converte a cor do cargo pra hex 
-					color = color.split(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/);
-					color = Number('0x' + self.rgbToHex(color[1], color[2], color[3]).toString());
-
-					if ($('.messages .message-group').hasClass('compact')) {
-						$('.quote-msg').find('.timestamp').first().find('i, .citar-btn').remove();
-						hourpost = $('.quote-msg').find('.timestamp').first().text();
-					}
+						text      = messages.map(m => m.content).join('\n'),
+						atServer  = msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
+						chName    = msgC.isPrivate() ? `@${msgC._getUsers()[0].username}` : `#${msgC.name}`;
 					
 					// os dados do embed 
 					var data = {
 							content: oldText,
 							embed: {
 								author: {
-									name: user,
-									icon_url: avatarUrl
+									name: msg.nick || author.username,
+									icon_url: author.getAvatarURL()
 								},
 								description: text,
 								footer: {
-									text: `in ${chanName}${atServerName} - ${hourpost}`
+									text: `in ${chName}${atServer}`
 								},
-								image: {url: ''},
-								fields: [],
-								color: color
+								color: color,
+								timestamp: msg.timestamp.toISOString()
 							}
-						},
-						chanID = window.location.pathname.split('/').pop();
+						};
 
-					// checar se tem alguma imagem na mensagem citada, e adicionar ao embed final
-					if ($('.quote-msg').find('.attachment-image').length >= 1) {
-						data.embed.image.url = $('.quote-msg').find('.attachment-image a').attr('href');
-					}
 					
-					// checar se tem algum arquivo na mensagem citada, e adicionar ao embed final
-					if ($('.quote-msg').find('.attachment').length >= 1) {
-						for (var i = 0; i < $('.quote-msg').find('.attachment').length; i++) {
-							var value     = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').text(),
-								link      = $($('.quote-msg').find('.attachment')[i]).find('.attachment-inner a').attr('href'),
-								attachNum = i + 1,
-								emoji     = '📁';
-							if (/(.apk|.appx|.pkg|.deb)$/.test(value)) {emoji = '📦'}
-							if (/(.jpg|.png|.gif)$/.test(value)) {emoji = '🖼'}
-							if (/(.zip|.rar|.tar.gz)$/.test(value)) {emoji = '📚'}
-							if (/(.txt)$/.test(value)) {emoji = '📄'}
-							data.embed.fields.push({name: `${stringLocal.attachment} #${attachNum}`, value: `${emoji} [${value}](${link})`});
+					var attachments = messages.map(m => m.attachments).reduce((a, b) => a.concat(b));
+					console.log(attachments);
+					if (attachments.length >= 1) {
+						// checar se tem alguma imagem na mensagem citada, e adicionar ao embed final
+						var imgAt = attachments.filter(a => a.width);
+						if(imgAt.length >= 1) {
+							data.embed.image = {url: attachments[0].url};
+						}
+						
+						// checar se tem algum arquivo na mensagem citada, e adicionar ao embed final
+						var otherAt = attachments.filter(a => !a.width);
+						if(otherAt.length >= 1) {
+							data.embed.fields = [];
+							otherAt.forEach((at, i) => {
+								var emoji = '📁';
+								if (/(.apk|.appx|.pkg|.deb)$/.test(at.filename)) emoji = '📦';
+								if (/(.jpg|.png|.gif)$/.test(at.filename)) emoji = '🖼';
+								if (/(.zip|.rar|.tar.gz)$/.test(at.filename)) emoji = '📚';
+								if (/(.txt)$/.test(at.filename)) emoji = '📄';
+								
+								data.embed.fields.push({name: `${self.getLocal().attachment} #${i+1}`, value: `${emoji} [${at.filename}](${at.url})`});
+							});
 						}
 					}
 					
 					// post do quote final
 					$.ajax({
 						type : "POST",
-						url : `https://discordapp.com/api/channels/${chanID}/messages`,
+						url : `https://discordapp.com/api/channels/${cc.id}/messages`,
 						headers : {
 							"Authorization": $('body').find('.citador-token-grabber')[0].contentWindow.localStorage.token.split('"')[1]
 						},
@@ -507,11 +463,12 @@ class Citador {
 		};
 		el[0].addEventListener("keydown", this.handleKeypress, false);
 		el[0].addEventListener("keyup", function(e) {
-			if (e.keyCode == 27 && isQuote == true) {
+			if (e.keyCode == 27 && self.quoteProps) {
 				self.cancelQuote();
 			}
 		}, false);
 	}
+	
 	deleteEverything() {
 		$(document).off("mouseover.citador");
 		$('.messages .message-group').off('mouseover');
@@ -519,33 +476,28 @@ class Citador {
 		BdApi.clearCSS("citador-css");
 		$('.citador-token-grabber').remove();
 	}
-	getName         () { return "Citador";             }
-	getDescription  () {
-		switch(navigator.language) {
-			case 'pt-BR':
-				return "Cita alguém no chat";
-			case 'ru-RU':
-				return "Котировки кто-то в чате";
-			case 'ja':
-				return "誰かをチャットで引用します";
-			default:
-				return "Quotes somebody in chat";
-		}
+	
+	getLocal() {
+		return this.locals[navigator.language] || this.locals["default"]
 	}
-	getVersion      () { return "1.5.8";               }
-	getAuthor       () { return "Nirewen";             }
-	getSettingsPanel() { return "";                    }
-	unload          () {   this.deleteEverything();    }
-	stop            () {   this.deleteEverything();    }
+	
+	getName         () { return "Citador";                  }
+	getDescription  () { return this.getLocal().description }
+	getVersion      () { return "1.5.8";                    }
+	getAuthor       () { return "Nirewen";             		}
+	getSettingsPanel() { return "";                    		}
+	load            () {                               		}
+	unload          () { this.deleteEverything();      		}
+	stop            () { this.deleteEverything();      		}
+	
 	onSwitch() {
 		this.attachParser();
-		if (isQuote == true) {
-			var elemento      = document.querySelector(".messages"),
-				channel       = this.getOwnerInstance(elemento, {include:["Channel"]}),
+		if (this.quoteProps) {
+			var channel       = this.getOwnerInstance($(".messages")[0], {include:["Channel"]}),
 				canEmbed      = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id}),
-				noPermTooltip = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
+				noPermTooltip = $("<div>").append(this.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
-			if (canEmbed == false) {
+			if (!canEmbed) {
 				$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
 				$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
@@ -568,12 +520,7 @@ class Citador {
 				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
 			}
-			if (serverName !== $('.name-3gtcmp').text() && serverName !== "") {
-				atServerName = ` at ${serverName}`;
-			} else if (serverName == $('.name-3gtcmp').text() || serverName == ""){
-				atServerName = '';
-			}
-			$('.channel-text-area-default').prepend(elem);
+			$('.channel-text-area-default').prepend(this.quoteMsg);
 		}
 	}
 }
