@@ -183,6 +183,16 @@ class Citador {
 				};
 				break;
 			}
+			case 'ja': {
+				stringLocal = {
+					startMsg: "起動完了",
+					quoteTooltip: "引用",
+					deleteTooltip: "削除",
+					noPermTooltip: "引用する権限がありません",
+					attachment: "添付ファイル"
+				};
+				break;
+			}
 			default: {
 				stringLocal = {
 					startMsg: "Started",
@@ -516,6 +526,8 @@ class Citador {
 				return "Cita alguém no chat";
 			case 'ru-RU':
 				return "Котировки кто-то в чате";
+			case 'ja':
+				return "誰かをチャットで引用します";
 			default:
 				return "Quotes somebody in chat";
 		}
@@ -531,7 +543,7 @@ class Citador {
 			var elemento      = document.querySelector(".messages"),
 				channel       = this.getOwnerInstance(elemento, {include:["Channel"]}),
 				canEmbed      = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id}),
-				noPermTooltip = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-error citador");
+				noPermTooltip = $("<div>").append(stringLocal.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
 			if (canEmbed == false) {
 				$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
@@ -542,8 +554,8 @@ class Citador {
 						if ($(this).hasClass('cant-embed')) {
 							$(".tooltips").append(noPermTooltip);
 							var position = $(this).offset();
-							position.top -= 30;
-							position.left += $(this).width()/2 - noPermTooltip.width()/2 - 5;
+							position.top -= 40;
+							position.left += $(this).width()/2 - noPermTooltip.width()/2 - 7;
 							noPermTooltip.offset(position);
 							$(this).on("mouseout.citador", function () {
 								$(this).off("mouseout.citador");
@@ -557,7 +569,7 @@ class Citador {
 				$('.quote-msg').find('.citar-btn').text("");
 			}
 			if (serverName !== $('.name-3gtcmp').text() && serverName !== "") {
-				atServerName = " at " + serverName;
+				atServerName = ` at ${serverName}`;
 			} else if (serverName == $('.name-3gtcmp').text() || serverName == ""){
 				atServerName = '';
 			}
