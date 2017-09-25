@@ -272,17 +272,7 @@ class Citador {
 									// define a função de clique, pra deletar uma mensagem que você não deseja citar
 									$('.quote-msg').find('.delete-msg-btn')
 										.click(function() {
-											if(self.quoteProps.messages.filter(m => !m.deleted).length < 2) {
-												self.cancelQuote();
-											} else {
-												var deleteMsg = $('.quote-msg .message').has(this),
-													deleteI   = $('.quote-msg .message').index(deleteMsg);
-											
-												deleteMsg.find('.message-text, .accessory').hide();
-												deleteTooltip.remove();
-											
-												self.quoteProps.messages[deleteI].deleted = true;
-											}
+											self.removeQuoteAtIndex($('.quote-msg .message').index($('.quote-msg .message').has(this)), () => deleteTooltip.remove());
 										})
 										.on('mouseover.citador', function() {
 											$(".tooltips").append(deleteTooltip);
@@ -306,22 +296,24 @@ class Citador {
 											var startI   = thisPost.find(".message").index(startPost),
 												endI     = thisPost.find(".message").index(endPost);
 											
-											self.selectionP = {
-												start: {
-													index: startI,
-													offset: range.startOffset
-												},
-												end: {
-													index: endI,
-													offset: range.endOffset
-												}
-											};
+											if(range.startOffset != range.endOffset || startI != endI) {
+												self.selectionP = {
+													start: {
+														index: startI,
+														offset: range.startOffset
+													},
+													end: {
+														index: endI,
+														offset: range.endOffset
+													}
+												};
 											
-											self.quoteProps.messages.forEach((m, i) => {
-												if(i == startI) $($('.quote-msg .message')[i]).find(".markup").text(m.content.substring(range.startOffset))
-												if(i == endI) $($('.quote-msg .message')[i]).find(".markup").text(m.content.substring(range.startOffset, range.endOffset))
-												if(i < startI || i > endI) $($('.quote-msg .message')[i]).hide();
-											});
+												self.quoteProps.messages.forEach((m, i) => {
+													if(i == startI) $($('.quote-msg .message')[i]).find(".markup").text(m.content.substring(range.startOffset));
+													if(i == endI) $($('.quote-msg .message')[i]).find(".markup").text(m.content.substring(range.startOffset, range.endOffset));
+													if(i < startI || i > endI) self.removeQuoteAtIndex(i);
+												});
+											}
 										}
 									}
 
@@ -375,6 +367,17 @@ class Citador {
 			}
 		});
 		this.log(this.getLocal().startMsg, "info");
+	}
+	
+	removeQuoteAtIndex(i, cb) {
+		if(this.quoteProps.messages.filter(m => !m.deleted).length < 2) {
+			this.cancelQuote();
+		} else {
+			var deleteMsg = $($('.quote-msg .message')[i]);								
+			deleteMsg.find('.message-text, .accessory').hide();		
+			this.quoteProps.messages[i].deleted = true;
+			if(cb && typeof cb == 'function') cb();
+		}
 	}
 	
 	attachParser() {
