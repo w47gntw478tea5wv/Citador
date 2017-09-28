@@ -32,8 +32,6 @@ Você também pode entrar no [servidor de suporte ao plugin](https://discord.gg/
 - Pra esse aqui eu não vou consertar, uma vez que Nitros não têm esse problema
 - Só não fique surpreso, a culpa não é do plugin em si, mas da API do Discord, 
   que impediu emotes globais em embeds (que é basicamente o que as quotes são)
-- [ ] Não é possível mencionar canais nem pessoas enquanto está citando ☹
-- [x] ~~Se apertar Shift + Enter a linha não quebra, pelo contrário, manda a mensagem~~
 
 ### Preview
 ![Citador em ação](http://nirewen.s-ul.eu/02Tcv6ZT.gif)
