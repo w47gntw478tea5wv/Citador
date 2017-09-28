@@ -181,7 +181,6 @@ class Citador {
 									range;
 								
 								self.quoteProps = $.extend(true, {}, self.getOwnerInstance(message[0]).props);
-								console.log(self.quoteProps)
 									
 								if (window.getSelection && window.getSelection().rangeCount > 0) {
 									range = window.getSelection().getRangeAt(0);
@@ -414,8 +413,6 @@ class Citador {
 							});
 						}
 					}
-					
-					console.log(embed)
 					
 					// cria uma mensagem com o conteúdo desejado (é necessário pra validar um "id")
 					var msg = self.MessageParser.createMessage(cc.id, msgCnt.content);
