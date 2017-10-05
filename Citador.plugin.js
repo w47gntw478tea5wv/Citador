@@ -41,50 +41,30 @@ class Citador {
 		
 		// Internal helpers
 		this.getInternalInstance = e => e[Object.keys(e).find(k => k.startsWith("__reactInternalInstance"))];
-		this.getComponent = (e) => {
-			let internal  = this.getInternalInstance(e),
-				variables = internal.return;
-			
-			if(typeof variables.stateNode === "object")
-				return variables.stateNode
-			else
-				return {
-					props: variables.memoizedProps,
-					state: variables.memoizedState
-				}
-		}
-		this.getOwnerInstance = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
+		this.getComponent = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
 			if (e === undefined)
 				return undefined;
 			const excluding = include === undefined;
 			const filter = excluding ? exclude : include;
 			function getDisplayName(owner) {
-				const type = owner._currentElement.type;
-				const constructor = owner._instance && owner._instance.constructor;
-				return type.displayName || constructor && constructor.displayName || null;
+				const type = owner.type;
+				return type.displayName || type.name || null;
 			}
 			function classFilter(owner) {
 				const name = getDisplayName(owner);
 				return (name !== null && !!(filter.includes(name) ^ excluding));
 			}
-
-			for (let prev, curr = this.getInternalInstance(e); !_.isNil(curr); prev = curr, curr = curr._hostParent) {
-				if (prev !== undefined && !_.isNil(curr._renderedChildren)) {
-					let owner = Object.values(curr._renderedChildren)
-						.find(v => !_.isNil(v._instance) && v.getHostNode() === prev.getHostNode());
-					if (!_.isNil(owner) && classFilter(owner))
-						return owner._instance;
-				}
-
-				if (_.isNil(curr._currentElement))
+			
+			for (let curr = this.getInternalInstance(e).return; !_.isNil(curr); curr = curr.return) {
+				if (_.isNil(curr))
 					continue;
-				let owner = curr._currentElement._owner;
-				if (!_.isNil(owner) && classFilter(owner))
-					return owner._instance;
+				let owner = curr.stateNode;
+				if (!_.isNil(owner) && !(owner instanceof HTMLElement) && classFilter(curr))
+					return owner;
 			}
-
+			
 			return null;
-		};
+		}
 		this.WebpackModules = (() => {
 			const req = webpackJsonp([], {
 				'__extra_id__': (module, exports, req) => exports.default = req
@@ -370,17 +350,18 @@ class Citador {
 						
 						author    = msg.author,
 						avatarURL = author.getAvatarURL(),
-						color     = Number(`0x${msg.colorString ? msg.colorString.slice(1) : 'ffffff'}`),
+						color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
 						msgCnt    = self.MessageParser.parse(cc, $('.channel-text-area-default textarea').val()),
-						text      = '',
-						atServer  = msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
-						chName    = msgC.isPrivate() ? `@${msgC._getUsers()[0].username}` : `#${msgC.name}`;
+						text      = messages.map(m => m.content).join('\n'),
+						atServer  = msgC.guild_id && msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
+						chName    = msgC.isDM() ? `@${msgC._getUsers()[0].username}` : msgC.isGroupDM() ? `${msgC.name}` : `#${msgC.name}`;
 					
 					if (self.selectionP) {
 						var start = self.selectionP.start,
 							end = self.selectionP.end;
 						
 						props.messages.forEach((m, i) => {
+							text = '';
 							if(!m.deleted) {
 								var endText = m.content;
 								if(end.index == start.index) endText = m.content.substring(start.offset, end.offset);
@@ -389,9 +370,7 @@ class Citador {
 								if(i >= start.index && i <= end.index) text += `${endText}\n`;
 							}
 						});
-					} else {
-						text = messages.map(m => m.content).join('\n');
-					}					
+					}				
 					
 					// os dados do embed 
 					let embed = {
@@ -452,7 +431,7 @@ class Citador {
 						}))
 					});
 					
-					$(this).val("").focus()[0].dispatchEvent(new Event('input', {bubbles: true}));
+					$(this).val('').focus()[0].dispatchEvent(new Event('input', {bubbles: true}));
 					
 					self.cancelQuote();
 					e.preventDefault();
