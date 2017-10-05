@@ -461,7 +461,7 @@ class Citador {
 	getLocal        () { return this.locals[navigator.language] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.0";                    }
+	getVersion      () { return "1.6.1";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
