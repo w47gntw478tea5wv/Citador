@@ -19,8 +19,8 @@ Um plugin pra facilitar a citação no chat, assim, nem você nem ninguém se pe
 Para instalar, siga os passos da instalação de um plugin comum:
 
 1. Baixe a última versão em [releases](https://github.com/nirewen/Citador/releases).
-2. Faça `Win` + `R` (ou abra o Executar pelo menu iniciar)
-3. Digite `%appdata%/BetterDiscord/plugins` e dê `Enter`
+2. Faça <kbd>Win</kbd> + <kbd>R</kbd> (ou abra o Executar pelo menu iniciar)
+3. Digite `%appdata%/BetterDiscord/plugins` e dê <kbd>Enter</kbd>
 4. Coloque o arquivo baixado nessa pasta.
 
 Qualquer dúvida, me chame no Discord: Nirewen`#9011`
