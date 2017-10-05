@@ -41,6 +41,18 @@ class Citador {
 		
 		// Internal helpers
 		this.getInternalInstance = e => e[Object.keys(e).find(k => k.startsWith("__reactInternalInstance"))];
+		this.getComponent = (e) => {
+			let internal  = this.getInternalInstance(e),
+				variables = internal.return;
+			
+			if(typeof variables.stateNode === "object")
+				return variables.stateNode
+			else
+				return {
+					props: variables.memoizedProps,
+					state: variables.memoizedState
+				}
+		}
 		this.getOwnerInstance = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
 			if (e === undefined)
 				return undefined;
@@ -176,11 +188,11 @@ class Citador {
 								self.attachParser();
 								
 								let message   = $(this).parents('.message-group'),
-									mInstance = self.getOwnerInstance($(".messages")[0]),
+									mInstance = self.getComponent($(".messages-wrapper")[0]),
 									channel   = mInstance.props.channel,
 									range;
 								
-								self.quoteProps = $.extend(true, {}, self.getOwnerInstance(message[0]).props);
+								self.quoteProps = $.extend(true, {}, self.getComponent(message[0]).props);
 									
 								if (window.getSelection && window.getSelection().rangeCount > 0) {
 									range = window.getSelection().getRangeAt(0);
@@ -321,13 +333,17 @@ class Citador {
 	}
 	
 	removeQuoteAtIndex(i, cb) {
-		if(this.quoteProps.messages.filter(m => !m.deleted).length < 2) {
-			this.cancelQuote();
+		if(this.quoteProps) {
+			if(this.quoteProps.messages.filter(m => !m.deleted).length < 2) {
+				this.cancelQuote();
+			} else {
+				let deleteMsg = $($('.quote-msg .message')[i]);								
+				deleteMsg.find('.message-text, .accessory').hide();		
+				this.quoteProps.messages[i].deleted = true;
+				if(cb && typeof cb == 'function') cb();
+			}
 		} else {
-			let deleteMsg = $($('.quote-msg .message')[i]);								
-			deleteMsg.find('.message-text, .accessory').hide();		
-			this.quoteProps.messages[i].deleted = true;
-			if(cb && typeof cb == 'function') cb();
+			this.cancelQuote();
 		}
 	}
 	
@@ -346,9 +362,9 @@ class Citador {
 					if (e.shiftKey || $('.autocomplete-1TnWNR').length >= 1) return;
 		
 					var messages  = props.messages.filter(m => !m.deleted),
-						guilds    = self.getOwnerInstance($(".guilds.scroller")[0]).state.guilds.map(o => o.guild),
+						guilds    = self.getComponent($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild),
 						msg		  = props.messages[0],
-						cc        = self.getOwnerInstance($("form")[0]).props.channel,
+						cc        = self.getComponent($("form")[0]).props.channel,
 						msgC      = props.channel,
 						msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
 						
@@ -475,8 +491,8 @@ class Citador {
 	onSwitch        () {
 		this.attachParser();
 		if (this.quoteProps) {
-			var channel       = this.getOwnerInstance($(".messages")[0], {include:["Channel"]}),
-				canEmbed      = channel.state.channel.isPrivate() || channel.can(0x4800, {channelId: channel.state.channel.id}),
+			var channel       = self.getComponent($(".messages-wrapper")[0]),
+				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
 				noPermTooltip = $("<div>").append(this.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
 			if (!canEmbed) {
