@@ -491,7 +491,7 @@ class Citador {
 	onSwitch        () {
 		this.attachParser();
 		if (this.quoteProps) {
-			var channel       = self.getComponent($(".messages-wrapper")[0]),
+			var channel       = this.getComponent($(".messages-wrapper")[0]),
 				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
 				noPermTooltip = $("<div>").append(this.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
