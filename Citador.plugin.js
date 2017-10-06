@@ -41,7 +41,7 @@ class Citador {
 		
 		// Internal helpers
 		this.getInternalInstance = e => e[Object.keys(e).find(k => k.startsWith("__reactInternalInstance"))];
-		this.getComponent = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
+		this.getOwnerInstance = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
 			if (e === undefined)
 				return undefined;
 			const excluding = include === undefined;
@@ -168,11 +168,11 @@ class Citador {
 								self.attachParser();
 								
 								let message   = $(this).parents('.message-group'),
-									mInstance = self.getComponent($(".messages-wrapper")[0]),
+									mInstance = self.getOwnerInstance($(".messages-wrapper")[0]),
 									channel   = mInstance.props.channel,
 									range;
 								
-								self.quoteProps = $.extend(true, {}, self.getComponent(message[0]).props);
+								self.quoteProps = $.extend(true, {}, self.getOwnerInstance(message[0]).props);
 									
 								if (window.getSelection && window.getSelection().rangeCount > 0) {
 									range = window.getSelection().getRangeAt(0);
@@ -342,9 +342,9 @@ class Citador {
 					if (e.shiftKey || $('.autocomplete-1TnWNR').length >= 1) return;
 		
 					var messages  = props.messages.filter(m => !m.deleted),
-						guilds    = self.getComponent($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild),
+						guilds    = self.getOwnerInstance($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild),
 						msg		  = props.messages[0],
-						cc        = self.getComponent($("form")[0]).props.channel,
+						cc        = self.getOwnerInstance($("form")[0]).props.channel,
 						msgC      = props.channel,
 						msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
 						
@@ -431,7 +431,7 @@ class Citador {
 						}))
 					});
 					
-					$(this).val('').focus()[0].dispatchEvent(new Event('input', {bubbles: true}));
+					self.getOwnerInstance($('form')[0]).setState({textValue: ''});
 					
 					self.cancelQuote();
 					e.preventDefault();
@@ -470,7 +470,7 @@ class Citador {
 	onSwitch        () {
 		this.attachParser();
 		if (this.quoteProps) {
-			var channel       = this.getComponent($(".messages-wrapper")[0]),
+			var channel       = this.getOwnerInstance($(".messages-wrapper")[0]),
 				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
 				noPermTooltip = $("<div>").append(this.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
