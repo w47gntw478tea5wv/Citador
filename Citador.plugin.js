@@ -9,7 +9,9 @@ class Citador {
 				quoteTooltip: "Citar",
 				deleteTooltip: "Excluir",
 				noPermTooltip: "Sem permissão para citar",
-				attachment: "Anexo"
+				attachment: "Anexo",
+				update: "Citador tem atualizações! ",
+				download: "Baixar"
 			},
 			'ru-RU': {
 				description: "Котировки кто-то в чате",
@@ -33,7 +35,9 @@ class Citador {
 				quoteTooltip: "Quote",
 				deleteTooltip: "Delete",
 				noPermTooltip: "No permission to quote",
-				attachment: "Attachment"
+				attachment: "Attachment",
+				update: "Citador got new updates! ",
+				download: "Download"
 			}
 		};
 		
@@ -119,6 +123,43 @@ class Citador {
 			default:
 				console.log   ( `[${this.getName()}]`, message );
 				break;
+		}
+	}
+	
+	checkForUpdate() {
+		const raw = `https://raw.githubusercontent.com/nirewen/${this.getName()}/auto-updater/${this.getName()}.plugin.js`
+		$.get(raw, (res) => {
+			let version = res.match(/"[0-9]+\.[0-9]+\.[0-9]+"/i),
+				localVersion = this.getVersion().split(".");
+				
+			if (!version) return;
+			version = version.toString().replace(/"/g, "").split(".");
+			
+			if (version[0] > localVersion[0]) this.notUpdated = true;
+			else if (version[0] == localVersion[0] && version[1] > localVersion[1]) this.notUpdated = true;
+			else if (version[0] == localVersion[0] && version[1] == localVersion[1] && version[2] > localVersion[2]) this.notUpdated = true;
+			else this.notUpdated = false;
+			
+			if (this.notUpdated)
+				this.showUpdateNotice();
+		});
+	}
+	
+	showUpdateNotice() {
+		BdApi.clearCSS("citador-notice");
+		BdApi.injectCSS("citador-notice", "#citador-notice span, #citador-notice span a {-webkit-app-region: no-drag;color:#fff;} #citador-notice span a:hover {text-decoration:underline;}")
+		let updateLink       = `https://betterdiscord.net/ghdl?url=https://github.com/nirewen/${this.getName()}/blob/auto-updater/${this.getName()}.plugin.js`,
+			noticeElement    = `
+			<div class="notice notice-info" id="citador-notice">
+				<div class="notice-dismiss" id="citador-dismiss"></div>${this.getLocal().update}<strong><a href="${updateLink}" target="_blank">${this.getLocal().download}</a></strong>
+			</div>`;
+		if (!$('#citador-notice').length)  {
+			$('.app.flex-vertical').children().first().before(noticeElement);
+			$('.win-buttons').addClass("win-buttons-notice")
+			$('#citador-dismiss').on('click', () => {
+				$('.win-buttons').animate({top: 0}, 400, "swing", () => {$('.win-buttons').css("top","").removeClass("win-buttons-notice")});
+				$('#citador-notice').slideUp({complete: () => {$('#citador-notice').remove()}});
+			})
 		}
 	}
 	
