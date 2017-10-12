@@ -140,8 +140,10 @@ class Citador {
 			else if (version[0] == localVersion[0] && version[1] == localVersion[1] && version[2] > localVersion[2]) this.notUpdated = true;
 			else this.notUpdated = false;
 			
-			if (this.notUpdated)
+			if (this.notUpdated) {
+				this.stop();
 				this.showUpdateNotice();
+			}
 		});
 	}
 	
@@ -173,6 +175,7 @@ class Citador {
 	}
 	
 	start() {
+		this.checkForUpdate();
 		var self = this;
 		BdApi.injectCSS("citador-css", this.css);
 		
@@ -502,7 +505,7 @@ class Citador {
 	getLocal        () { return this.locals[navigator.language] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.1";                    }
+	getVersion      () { return "1.6.2";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
