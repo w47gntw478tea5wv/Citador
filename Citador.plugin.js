@@ -11,7 +11,8 @@ class Citador {
 				noPermTooltip: "Sem permissão para citar",
 				attachment: "Anexo",
 				update: "Citador tem atualizações! ",
-				download: "Baixar"
+				download: "Baixar",
+				newUpdateErr: "Plugin desatualizado"
 			},
 			'ru-RU': {
 				description: "Котировки кто-то в чате",
@@ -37,7 +38,8 @@ class Citador {
 				noPermTooltip: "No permission to quote",
 				attachment: "Attachment",
 				update: "Citador got new updates! ",
-				download: "Download"
+				download: "Download",
+				newUpdateErr: "Outdated plugin"
 			}
 		};
 		
@@ -127,7 +129,7 @@ class Citador {
 	}
 	
 	checkForUpdate() {
-		const raw = `https://raw.githubusercontent.com/nirewen/${this.getName()}/auto-updater/${this.getName()}.plugin.js`
+		const raw = `https://raw.githubusercontent.com/nirewen/${this.getName()}/pt/${this.getName()}.plugin.js`
 		$.get(raw, (res) => {
 			let version = res.match(/"[0-9]+\.[0-9]+\.[0-9]+"/i),
 				localVersion = this.getVersion().split(".");
@@ -142,25 +144,26 @@ class Citador {
 			
 			if (this.notUpdated) {
 				this.stop();
+				this.log(this.getLocal().newUpdateErr, 'error');
 				this.showUpdateNotice();
 			}
 		});
 	}
 	
 	showUpdateNotice() {
-		BdApi.clearCSS("citador-notice");
-		BdApi.injectCSS("citador-notice", "#citador-notice span, #citador-notice span a {-webkit-app-region: no-drag;color:#fff;} #citador-notice span a:hover {text-decoration:underline;}")
-		let updateLink       = `https://betterdiscord.net/ghdl?url=https://github.com/nirewen/${this.getName()}/blob/auto-updater/${this.getName()}.plugin.js`,
+		BdApi.clearCSS("citador-notice-css");
+		BdApi.injectCSS("citador-notice-css", "#citador-notice, #citador-notice a {color:#fff;} #citador-notice a:hover {text-decoration:underline;}")
+		let updateLink       = `https://betterdiscord.net/ghdl?url=https://github.com/nirewen/${this.getName()}/blob/pt/${this.getName()}.plugin.js`,
 			noticeElement    = `
 			<div class="notice notice-info" id="citador-notice">
 				<div class="notice-dismiss" id="citador-dismiss"></div>${this.getLocal().update}<strong><a href="${updateLink}" target="_blank">${this.getLocal().download}</a></strong>
 			</div>`;
 		if (!$('#citador-notice').length)  {
 			$('.app.flex-vertical').children().first().before(noticeElement);
-			$('.win-buttons').addClass("win-buttons-notice")
+			$('.win-buttons').addClass("win-buttons-notice");
 			$('#citador-dismiss').on('click', () => {
-				$('.win-buttons').animate({top: 0}, 400, "swing", () => {$('.win-buttons').css("top","").removeClass("win-buttons-notice")});
-				$('#citador-notice').slideUp({complete: () => {$('#citador-notice').remove()}});
+				$('.win-buttons').animate({top: 0}, 400, "swing", () => $('.win-buttons').css("top","").removeClass("win-buttons-notice"));
+				$('#citador-notice').slideUp({complete: () => $('#citador-notice').remove()});
 			})
 		}
 	}
@@ -505,7 +508,7 @@ class Citador {
 	getLocal        () { return this.locals[navigator.language] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.2";                    }
+	getVersion      () { return "1.6.1";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
