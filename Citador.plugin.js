@@ -9,10 +9,7 @@ class Citador {
 				quoteTooltip: "Citar",
 				deleteTooltip: "Excluir",
 				noPermTooltip: "Sem permissão para citar",
-				attachment: "Anexo",
-				update: "Citador tem atualizações! ",
-				download: "Baixar",
-				newUpdateErr: "Plugin desatualizado"
+				attachment: "Anexo"
 			},
 			'ru': {
 				description: "Котировки кто-то в чате",
@@ -36,10 +33,7 @@ class Citador {
 				quoteTooltip: "Quote",
 				deleteTooltip: "Delete",
 				noPermTooltip: "No permission to quote",
-				attachment: "Attachment",
-				update: "Citador got new updates! ",
-				download: "Download",
-				newUpdateErr: "Outdated plugin"
+				attachment: "Attachment"
 			}
 		};
 		
@@ -483,7 +477,7 @@ class Citador {
 	getLocal        () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.3";                    }
+	getVersion      () { return "1.6.2";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
