@@ -128,46 +128,6 @@ class Citador {
 		}
 	}
 	
-	checkForUpdate() {
-		const raw = `https://raw.githubusercontent.com/nirewen/${this.getName()}/pt/${this.getName()}.plugin.js`
-		$.get(raw, (res) => {
-			let version = res.match(/"[0-9]+\.[0-9]+\.[0-9]+"/i),
-				localVersion = this.getVersion().split(".");
-				
-			if (!version) return;
-			version = version.toString().replace(/"/g, "").split(".");
-			
-			if (version[0] > localVersion[0]) this.notUpdated = true;
-			else if (version[0] == localVersion[0] && version[1] > localVersion[1]) this.notUpdated = true;
-			else if (version[0] == localVersion[0] && version[1] == localVersion[1] && version[2] > localVersion[2]) this.notUpdated = true;
-			else this.notUpdated = false;
-			
-			if (this.notUpdated) {
-				this.stop();
-				this.log(this.getLocal().newUpdateErr, 'error');
-				this.showUpdateNotice();
-			}
-		});
-	}
-	
-	showUpdateNotice() {
-		BdApi.clearCSS("citador-notice-css");
-		BdApi.injectCSS("citador-notice-css", "#citador-notice, #citador-notice a {color:#fff;} #citador-notice a:hover {text-decoration:underline;}")
-		let updateLink       = `https://betterdiscord.net/ghdl?url=https://github.com/nirewen/${this.getName()}/blob/pt/${this.getName()}.plugin.js`,
-			noticeElement    = `
-			<div class="notice notice-info" id="citador-notice">
-				<div class="notice-dismiss" id="citador-dismiss"></div>${this.getLocal().update}<strong><a href="${updateLink}" target="_blank">${this.getLocal().download}</a></strong>
-			</div>`;
-		if (!$('#citador-notice').length)  {
-			$('.app.flex-vertical').children().first().before(noticeElement);
-			$('.win-buttons').addClass("win-buttons-notice");
-			$('#citador-dismiss').on('click', () => {
-				$('.win-buttons').animate({top: 0}, 400, "swing", () => $('.win-buttons').css("top","").removeClass("win-buttons-notice"));
-				$('#citador-notice').slideUp({complete: () => $('#citador-notice').remove()});
-			})
-		}
-	}
-	
 	cancelQuote() {
 		$('.quote-msg').slideUp(150, () => { $('.quote-msg').remove() });
 		$('.tooltip.citador').remove();
@@ -178,7 +138,17 @@ class Citador {
 	}
 	
 	start() {
-		this.checkForUpdate();
+		var libraryScript = document.getElementById('zeresLibraryScript');
+		if (libraryScript) libraryScript.parentElement.removeChild(libraryScript);
+		libraryScript = document.createElement("script");
+		libraryScript.setAttribute("type", "text/javascript");
+		libraryScript.setAttribute("src", "https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js");
+		libraryScript.setAttribute("id", "zeresLibraryScript");
+		document.head.appendChild(libraryScript);
+
+		if (typeof window.ZeresLibrary !== "undefined") this.initialize();
+		else libraryScript.addEventListener("load", () => { this.initialize(); });
+
 		var self = this;
 		BdApi.injectCSS("citador-css", this.css);
 		
@@ -359,6 +329,10 @@ class Citador {
 		this.log(this.getLocal().startMsg, "info");
 	}
 	
+	initialize() {
+		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
+	}
+
 	removeQuoteAtIndex(i, cb) {
 		if(this.quoteProps) {
 			if(this.quoteProps.messages.filter(m => !m.deleted).length < 2) {
@@ -508,7 +482,7 @@ class Citador {
 	getLocal        () { return this.locals[navigator.language] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.1";                    }
+	getVersion      () { return "1.6.2";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
