@@ -3,7 +3,7 @@
 class Citador {
 	constructor() {
 		this.locals = {
-			'pt-BR': {
+			'pt': {
 				description: "Cita alguém no chat",
 				startMsg: "Iniciado",
 				quoteTooltip: "Citar",
@@ -14,7 +14,7 @@ class Citador {
 				download: "Baixar",
 				newUpdateErr: "Plugin desatualizado"
 			},
-			'ru-RU': {
+			'ru': {
 				description: "Котировки кто-то в чате",
 				startMsg: "Начало",
 				quoteTooltip: "Цитата",
@@ -327,6 +327,7 @@ class Citador {
 			}
 		});
 		this.log(this.getLocal().startMsg, "info");
+		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.getLocal().startMsg.toLowerCase()}`)
 	}
 	
 	initialize() {
@@ -479,10 +480,10 @@ class Citador {
 		BdApi.clearCSS("citador-css");
 	}
 	
-	getLocal        () { return this.locals[navigator.language] || this.locals["default"] }
+	getLocal        () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.2";                    }
+	getVersion      () { return "1.6.3";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
