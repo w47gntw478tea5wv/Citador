@@ -9,7 +9,10 @@ class Citador {
 				quoteTooltip: "Citar",
 				deleteTooltip: "Excluir",
 				noPermTooltip: "Sem permissão para citar",
-				attachment: "Anexo"
+				attachment: "Anexo",
+				update: "Citador tem atualizações! ",
+				download: "Baixar",
+				newUpdateErr: "Plugin desatualizado"
 			},
 			'ru': {
 				description: "Котировки кто-то в чате",
@@ -33,7 +36,10 @@ class Citador {
 				quoteTooltip: "Quote",
 				deleteTooltip: "Delete",
 				noPermTooltip: "No permission to quote",
-				attachment: "Attachment"
+				attachment: "Attachment",
+				update: "Citador got new updates! ",
+				download: "Download",
+				newUpdateErr: "Outdated plugin"
 			}
 		};
 		
