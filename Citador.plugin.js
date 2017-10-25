@@ -154,9 +154,9 @@ class Citador {
 					citarBtn       = '<span class="citar-btn"></span>',
 					closeBtn       = '<div class="quote-close"></div>',
 					deleteMsgBtn   = '<div class="delete-msg-btn"></div>',
-					quoteTooltip   = $("<div>").append(self.getLocal().quoteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
-					deleteTooltip  = $("<div>").append(self.getLocal().deleteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
-					noPermTooltip  = $("<div>").append(self.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
+					quoteTooltip   = $("<div>").append(self.local.quoteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
+					deleteTooltip  = $("<div>").append(self.local.deleteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
+					noPermTooltip  = $("<div>").append(self.local.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 				
 				todasMensagens
 				.on('mouseover', function() {
@@ -320,12 +320,12 @@ class Citador {
 				});
 			}
 		});
-		this.log(this.getLocal().startMsg, "info");
+		this.log(this.local.startMsg, "info");
 	}
 	
 	initialize() {
 		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
-		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.getLocal().startMsg.toLowerCase()}`);
+		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
 	}
 
 	removeQuoteAtIndex(i, cb) {
@@ -344,7 +344,7 @@ class Citador {
 	}
 	
 	attachParser() {
-		var el   = $('.channel-text-area-default textarea'),
+		var el   = $('.channelTextArea-1HTP3C'),
 			self = this;
 			
 		if (el.length == 0) return;
@@ -420,7 +420,7 @@ class Citador {
 								if (/(.zip|.rar|.tar.gz)$/.test(at.filename)) emoji = '📚';
 								if (/(.txt)$/.test(at.filename)) emoji = '📄';
 								
-								embed.fields.push({name: `${self.getLocal().attachment} #${i+1}`, value: `${emoji} [${at.filename}](${at.url})`});
+								embed.fields.push({name: `${self.local.attachment} #${i+1}`, value: `${emoji} [${at.filename}](${at.url})`});
 							});
 						}
 					}
@@ -474,10 +474,10 @@ class Citador {
 		BdApi.clearCSS("citador-css");
 	}
 	
-	getLocal        () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
+	get local       () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
-	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.3";                    }
+	getDescription  () { return this.local.description      }
+	getVersion      () { return "1.6.4";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
@@ -488,7 +488,7 @@ class Citador {
 		if (this.quoteProps) {
 			var channel       = this.getOwnerInstance($(".messages-wrapper")[0]),
 				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
-				noPermTooltip = $("<div>").append(this.getLocal().noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
+				noPermTooltip = $("<div>").append(this.local.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
 			if (!canEmbed) {
 				$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
