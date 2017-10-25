@@ -321,11 +321,11 @@ class Citador {
 			}
 		});
 		this.log(this.getLocal().startMsg, "info");
-		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.getLocal().startMsg.toLowerCase()}`)
 	}
 	
 	initialize() {
 		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
+		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.getLocal().startMsg.toLowerCase()}`);
 	}
 
 	removeQuoteAtIndex(i, cb) {
@@ -477,7 +477,7 @@ class Citador {
 	getLocal        () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.getLocal().description }
-	getVersion      () { return "1.6.2";                    }
+	getVersion      () { return "1.6.3";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
