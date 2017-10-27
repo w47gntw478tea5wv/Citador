@@ -70,7 +70,7 @@ class Citador {
 	}
 	
 	start() {
-		let self = this;
+		var self = this;
 		$('#zeresLibraryScript').remove();
 		$('head').append($("<script type='text/javascript' id='zeresLibraryScript' src='https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js'>"));
 		
@@ -261,6 +261,7 @@ class Citador {
 	initialize() {
 		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
 		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
+		PluginUtilities.createSwitchObserver(this);
 		this.MessageParser     = PluginUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
 		this.MessageQueue      = PluginUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
 		this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
@@ -417,13 +418,13 @@ class Citador {
 	get local       () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.local.description      }
-	getVersion      () { return "1.6.6";                    }
+	getVersion      () { return "1.6.7";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
 	stop            () { this.deleteEverything();      		}
 	load            () {                               		}
-	onSwitch        () {
+	onChannelSwitch () {
 		this.attachParser();
 		if (this.quoteProps) {
 			var channel       = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
@@ -453,6 +454,7 @@ class Citador {
 				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
 			}
+			console.log(this.quoteMsg);
 			$('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
 		}
 	}
