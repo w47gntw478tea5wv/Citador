@@ -454,7 +454,6 @@ class Citador {
 				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
 			}
-			console.log(this.quoteMsg);
 			$('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
 		}
 	}
