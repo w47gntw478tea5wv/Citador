@@ -239,7 +239,7 @@ class Citador {
 											});
 										});
 									
-									$('.channel-text-area-default textarea').focus();
+									$('.channelTextArea-1HTP3C').focus();
 
 									if (range) {
 										var startPost = $(range.startContainer).closest('.message'),
@@ -307,7 +307,7 @@ class Citador {
 								if ($('.quote-msg .message-group').length > 0)
 									$('.quote-msg .message-group').remove();
 								else
-									$('.channel-text-area-default').prepend('<div class="quote-msg"></div>');
+									$('.channelTextArea-1HTP3C').prepend('<div class="quote-msg"></div>');
 								
 								this.createQuote();
 							});
@@ -367,7 +367,7 @@ class Citador {
 						author    = msg.author,
 						avatarURL = author.getAvatarURL(),
 						color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
-						msgCnt    = self.MessageParser.parse(cc, $('.channel-text-area-default textarea').val()),
+						msgCnt    = self.MessageParser.parse(cc, $('.channelTextArea-1HTP3C').val()),
 						text      = messages.map(m => m.content).join('\n'),
 						atServer  = msgC.guild_id && msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
 						chName    = msgC.isDM() ? `@${msgC._getUsers()[0].username}` : msgC.isGroupDM() ? `${msgC.name}` : `#${msgC.name}`;
@@ -477,7 +477,7 @@ class Citador {
 	get local       () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.local.description      }
-	getVersion      () { return "1.6.4";                    }
+	getVersion      () { return "1.6.5";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
@@ -513,7 +513,7 @@ class Citador {
 				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
 				$('.quote-msg').find('.citar-btn').text("");
 			}
-			$('.channel-text-area-default').prepend(this.quoteMsg);
+			$('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
 		}
 	}
 }
