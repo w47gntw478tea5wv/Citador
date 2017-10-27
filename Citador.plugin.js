@@ -38,68 +38,6 @@ class Citador {
 		};
 		
 		this.css = '@import url("https://rawgit.com/nirewen/2cf758092d3a13d3a59298bc43eb30c0/raw/906cfca10ea9689078d67f3130b609e2010d2736/style.css")';
-		
-		// Internal helpers
-		this.getInternalInstance = e => e[Object.keys(e).find(k => k.startsWith("__reactInternalInstance"))];
-		this.getOwnerInstance = (e, {include, exclude=["Popout", "Tooltip", "Scroller", "BackgroundFlash"]} = {}) => {
-			if (e === undefined)
-				return undefined;
-			const excluding = include === undefined;
-			const filter = excluding ? exclude : include;
-			function getDisplayName(owner) {
-				const type = owner.type;
-				return type.displayName || type.name || null;
-			}
-			function classFilter(owner) {
-				const name = getDisplayName(owner);
-				return (name !== null && !!(filter.includes(name) ^ excluding));
-			}
-			
-			for (let curr = this.getInternalInstance(e).return; !_.isNil(curr); curr = curr.return) {
-				if (_.isNil(curr))
-					continue;
-				let owner = curr.stateNode;
-				if (!_.isNil(owner) && !(owner instanceof HTMLElement) && classFilter(curr))
-					return owner;
-			}
-			
-			return null;
-		}
-		this.WebpackModules = (() => {
-			const req = webpackJsonp([], {
-				'__extra_id__': (module, exports, req) => exports.default = req
-			}, ['__extra_id__']).default;
-			delete req.m['__extra_id__'];
-			delete req.c['__extra_id__'];
-			const find = (filter) => {
-				for (let i in req.c) {
-					if (req.c.hasOwnProperty(i)) {
-						let m = req.c[i].exports;
-						if (m && m.__esModule && m.default) m = m.default;
-						if (m && filter(m)) return m;
-					}
-				}
-				console.warn('Cannot find loaded module in cache. Loading all modules may have unexpected side effects');
-				for (let i = 0; i < req.m.length; ++i) {
-					let m = req(i);
-					if (m && m.__esModule && m.default) m = m.default;
-					if (m && filter(m)) return m;
-				}
-				console.warn('Cannot find module');
-				return null;
-			};
-			
-			const findByUniqueProperties = (propNames) => find(module => propNames.every(prop => module[prop] !== undefined));
-			const findByDisplayName = (displayName) => find(module => module.displayName === displayName);
-				
-			return {find, findByUniqueProperties, findByDisplayName};
-		})();
-		
-		this.MessageParser     = this.WebpackModules.findByUniqueProperties(["createBotMessage"]);
-		this.MessageQueue      = this.WebpackModules.findByUniqueProperties(["enqueue"]);
-		this.MessageController = this.WebpackModules.findByUniqueProperties(["sendClydeError"]);
-		this.EventDispatcher   = this.WebpackModules.findByUniqueProperties(["dispatch"]);
-		this.MainDiscord       = this.WebpackModules.findByUniqueProperties(["ActionTypes"]);
 	}
 	
 	log(message, method) {
@@ -132,18 +70,15 @@ class Citador {
 	}
 	
 	start() {
-		var libraryScript = document.getElementById('zeresLibraryScript');
-		if (libraryScript) libraryScript.parentElement.removeChild(libraryScript);
-		libraryScript = document.createElement("script");
-		libraryScript.setAttribute("type", "text/javascript");
-		libraryScript.setAttribute("src", "https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js");
-		libraryScript.setAttribute("id", "zeresLibraryScript");
-		document.head.appendChild(libraryScript);
-
-		if (typeof window.ZeresLibrary !== "undefined") this.initialize();
-		else libraryScript.addEventListener("load", () => { this.initialize(); });
-
-		var self = this;
+		let self = this;
+		$('#zeresLibraryScript').remove();
+		$('head').append($("<script type='text/javascript' id='zeresLibraryScript' src='https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js'>"));
+		
+		if (typeof window.ZeresLibrary !== "undefined") 
+			this.initialize();
+		else 
+			$('#zeresLibraryScript').on("load", () => self.initialize());
+		
 		BdApi.injectCSS("citador-css", this.css);
 		
 		$(document).on("mouseover.citador", function(e) {
@@ -179,11 +114,11 @@ class Citador {
 								self.attachParser();
 								
 								let message   = $(this).parents('.message-group'),
-									mInstance = self.getOwnerInstance($(".messages-wrapper")[0]),
+									mInstance = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
 									channel   = mInstance.props.channel,
 									range;
 								
-								self.quoteProps = $.extend(true, {}, self.getOwnerInstance(message[0]).props);
+								self.quoteProps = $.extend(true, {}, ReactUtilities.getOwnerInstance(message[0]).props);
 									
 								if (window.getSelection && window.getSelection().rangeCount > 0) {
 									range = window.getSelection().getRangeAt(0);
@@ -326,6 +261,11 @@ class Citador {
 	initialize() {
 		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
 		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
+		this.MessageParser     = PluginUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
+		this.MessageQueue      = PluginUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
+		this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
+		this.EventDispatcher   = PluginUtilities.WebpackModules.findByUniqueProperties(["dispatch"]);
+		this.MainDiscord       = PluginUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
 	}
 
 	removeQuoteAtIndex(i, cb) {
@@ -358,16 +298,16 @@ class Citador {
 					if (e.shiftKey || $('.autocomplete-1TnWNR').length >= 1) return;
 		
 					var messages  = props.messages.filter(m => !m.deleted),
-						guilds    = self.getOwnerInstance($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild),
+						guilds    = ReactUtilities.getOwnerInstance($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild),
 						msg		  = props.messages[0],
-						cc        = self.getOwnerInstance($("form")[0]).props.channel,
+						cc        = ReactUtilities.getOwnerInstance($("form")[0]).props.channel,
 						msgC      = props.channel,
 						msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
 						
 						author    = msg.author,
 						avatarURL = author.getAvatarURL(),
 						color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
-						msgCnt    = self.MessageParser.parse(cc, $('.channelTextArea-1HTP3C').val()),
+						msgCnt    = self.MessageParser.parse(cc, $('.channelTextArea-1HTP3C textarea').val()),
 						text      = messages.map(m => m.content).join('\n'),
 						atServer  = msgC.guild_id && msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
 						chName    = msgC.isDM() ? `@${msgC._getUsers()[0].username}` : msgC.isGroupDM() ? `${msgC.name}` : `#${msgC.name}`;
@@ -447,7 +387,7 @@ class Citador {
 						}))
 					});
 					
-					self.getOwnerInstance($('form')[0]).setState({textValue: ''});
+					ReactUtilities.getOwnerInstance($('form')[0]).setState({textValue: ''});
 					
 					self.cancelQuote();
 					e.preventDefault();
@@ -477,7 +417,7 @@ class Citador {
 	get local       () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.local.description      }
-	getVersion      () { return "1.6.5";                    }
+	getVersion      () { return "1.6.6";                    }
 	getAuthor       () { return "Nirewen";             		}
 	getSettingsPanel() { return "";                    		}
 	unload          () { this.deleteEverything();      		}
