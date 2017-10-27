@@ -12,9 +12,9 @@ class Citador {
 				attachment: "Anexo"
 			},
 			'ru': {
-				description: "Котировки кто-то в чате",
-				startMsg: "Начало",
-				quoteTooltip: "Цитата",
+				description: "Позволяет цитировать сообщения",
+				startMsg: "Запущен",
+				quoteTooltip: "Цитировать",
 				deleteTooltip: "Удалить",
 				noPermTooltip: "Нет прав для цитирования",
 				attachment: "Вложение"
