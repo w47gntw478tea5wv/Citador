@@ -426,7 +426,7 @@ class Citador {
 	onSwitch        () {
 		this.attachParser();
 		if (this.quoteProps) {
-			var channel       = this.getOwnerInstance($(".messages-wrapper")[0]),
+			var channel       = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
 				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
 				noPermTooltip = $("<div>").append(this.local.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
 			
