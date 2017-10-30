@@ -1,67 +1,60 @@
 //META{"name":"Citador"}*//
 
 class Citador {
-	constructor() {
-		this.locals = {
-			'pt': {
-				description: "Cita alguém no chat",
-				startMsg: "Iniciado",
-				quoteTooltip: "Citar",
-				deleteTooltip: "Excluir",
-				noPermTooltip: "Sem permissão para citar",
-				attachment: "Anexo"
-			},
-			'ru': {
-				description: "Позволяет цитировать сообщения",
-				startMsg: "Запущен",
-				quoteTooltip: "Цитировать",
-				deleteTooltip: "Удалить",
-				noPermTooltip: "Нет прав для цитирования",
-				attachment: "Вложение"
-			},
-			'ja': {
-				description: "誰かをチャットで引用します",
-				startMsg: "起動完了",
-				quoteTooltip: "引用",
-				deleteTooltip: "削除",
-				noPermTooltip: "引用する権限がありません",
-				attachment: "添付ファイル"
-			},
-			'default': {
-				description: "Quotes somebody in chat",
-				startMsg: "Started",
-				quoteTooltip: "Quote",
-				deleteTooltip: "Delete",
-				noPermTooltip: "No permission to quote",
-				attachment: "Attachment"
-			}
-		};
-		
-		this.css = '@import url("https://rawgit.com/nirewen/2cf758092d3a13d3a59298bc43eb30c0/raw/906cfca10ea9689078d67f3130b609e2010d2736/style.css")';
-	}
-	
-	log(message, method) {
-		switch (method) {
-			case "warn":
-				console.warn  ( `[${this.getName()}]`, message );
-				break;
-			case "error":
-				console.error ( `[${this.getName()}]`, message );
-				break;
-			case "debug":
-				console.debug ( `[${this.getName()}]`, message );
-				break;
-			case "info":
-				console.info  ( `[${this.getName()}]`, message );
-				break;
-			default:
-				console.log   ( `[${this.getName()}]`, message );
-				break;
+	get local() {
+		let lang = navigator.language.split('-')[0];
+		if (document.documentElement.getAttribute('lang')) 
+			lang = document.documentElement.getAttribute('lang').split('-')[0];
+		switch (lang) {
+			case 'pt': 
+				return {
+					description: "Cita alguém no chat",
+					startMsg: "Iniciado",
+					quoteTooltip: "Citar",
+					deleteTooltip: "Excluir",
+					noPermTooltip: "Sem permissão para citar",
+					attachment: "Anexo"
+				};
+			case 'ru': 
+				return {
+					description: "Позволяет цитировать сообщения",
+					startMsg: "Запущен",
+					quoteTooltip: "Цитировать",
+					deleteTooltip: "Удалить",
+					noPermTooltip: "Нет прав для цитирования",
+					attachment: "Вложение"
+				};
+			case 'ja': 
+				return {
+					description: "誰かをチャットで引用します",
+					startMsg: "起動完了",
+					quoteTooltip: "引用",
+					deleteTooltip: "削除",
+					noPermTooltip: "引用する権限がありません",
+					attachment: "添付ファイル"
+				};
+			default: 
+				return {
+					description: "Quotes somebody in chat",
+					startMsg: "Started",
+					quoteTooltip: "Quote",
+					deleteTooltip: "Delete",
+					noPermTooltip: "No permission to quote",
+					attachment: "Attachment"
+				};
 		}
 	}
 	
+	log(message, method = 'log') {
+		console[method](`[${this.getName()}]`, message);
+	}
+	
+	inject(element, options) {
+		$('head').append($(element, options));
+	}
+	
 	cancelQuote() {
-		$('.quote-msg').slideUp(150, () => { $('.quote-msg').remove() });
+		$('.quote-msg').slideUp(300, () => $('.quote-msg').remove());
 		$('.tooltip.citador').remove();
 		this.quoteMsg   = null;
 		this.quoteProps.messages.forEach(m => m.deleted = null);
@@ -72,187 +65,158 @@ class Citador {
 	start() {
 		var self = this;
 		$('#zeresLibraryScript').remove();
-		$('head').append($("<script type='text/javascript' id='zeresLibraryScript' src='https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js'>"));
+		self.inject('<script>', {
+			type: 'text/javascript',
+			id: 'zeresLibraryScript',
+			src: 'https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js'
+		});
+		self.inject('<link>', {
+			type: 'text/css',
+			id: 'citador-css',
+			rel: 'stylesheet',
+			href: 'https://rawgit.com/nirewen/Citador/quote-btn/Citador.styles.css'
+		});
 		
 		if (typeof window.ZeresLibrary !== "undefined") 
 			this.initialize();
 		else 
 			$('#zeresLibraryScript').on("load", () => self.initialize());
 		
-		BdApi.injectCSS("citador-css", this.css);
-		
 		$(document).on("mouseover.citador", function(e) {
 			var target = $(e.target);
 			if (target.parents(".message").length > 0) {
-				var todasMensagens = $('.messages .message-group'),
-					nomeData       = $('.messages .message-group .comment .body h2'),
-					citarBtn       = '<span class="citar-btn"></span>',
-					closeBtn       = '<div class="quote-close"></div>',
-					deleteMsgBtn   = '<div class="delete-msg-btn"></div>',
-					quoteTooltip   = $("<div>").append(self.local.quoteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
-					deleteTooltip  = $("<div>").append(self.local.deleteTooltip).addClass("tooltip tooltip-top tooltip-black citador"),
-					noPermTooltip  = $("<div>").append(self.local.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
-				
-				todasMensagens
-				.on('mouseover', function() {
-					if ($(this).find('.citar-btn').length == 0) {
-						todasMensagens.hasClass('compact') ? $(this).find('.timestamp').first().prepend(citarBtn) : $(this).find(nomeData).append(citarBtn);
-						$(this).find('.citar-btn')
-							.on('mousedown.citador', function() {return false})
-							.on('mouseover.citador', function() {
-								$(".tooltips").append(quoteTooltip);
-								let position = $(this).offset();
-								position.top -= 40;
-								position.left += $(this).width()/2 - quoteTooltip.width()/2 - 7;
-								quoteTooltip.offset(position);
-								$(this).on("mouseout.citador", function () {
-									$(this).off("mouseout.citador");
-									quoteTooltip.remove();
-								});
-							})
-							.click(function() {
-								self.attachParser();
+				$('.messages .message-group')
+					.on('mouseover', function() {
+						if ($(this).find('.citar-btn').length == 0) {
+							$('.messages .message-group').hasClass('compact') 
+								? $(this).find('.timestamp').first().prepend('<span class="citar-btn"></span>') 
+								: $(this).find($('.messages .message-group .comment .body h2')).append('<span class="citar-btn"></span>');
 								
-								let message   = $(this).parents('.message-group'),
-									mInstance = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
-									channel   = mInstance.props.channel,
-									range;
-								
-								self.quoteProps = $.extend(true, {}, ReactUtilities.getOwnerInstance(message[0]).props);
+							new PluginTooltip.Tooltip($(this).find('.citar-btn'), self.local.quoteTooltip);
+							$(this).find('.citar-btn')
+								.on('mousedown.citador', function() {return false})
+								.click(function() {
+									self.attachParser();
 									
-								if (window.getSelection && window.getSelection().rangeCount > 0) {
-									range = window.getSelection().getRangeAt(0);
-								} else if (document.selection && document.selection.type !== 'Control') {
-									range = document.selection.createRange();
-								}
-								var thisPost = $(this).closest('.comment');
-								
-								this.createQuote = function() {
-									var messageElem = $(message).clone().hide().appendTo(".quote-msg");
-									self.quoteMsg = $(".quote-msg");
+									let message   = $(this).parents('.message-group'),
+										mInstance = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
+										channel   = mInstance.props.channel,
+										range;
 									
-									$('.quote-msg').find('.citar-btn').toggleClass('quoting');
-									$('.quote-msg').find('.citar-btn').text('');
-									
-									$('.quote-msg').find('.embed').each(function() {
-										$(this).closest('.accessory').remove();
-									});
-									
-									$('.quote-msg').find('.markup').each(function() {
-										if (0 === $(this).text().length + $(this).children().length + $(this).closest(".message").find('.accessory').length) {
-											$(this).closest('.message-text').remove();
-										}
-									});
-									$('.quote-msg').find('.message-content').each(function() {
-										if (0 === $(this).text().length + $(this).children().length + $(this).closest(".message").find('.accessory').length) {
-											$(this).closest('.message-text').remove();
-										}
-									});
-
-									$('.quote-msg').find('.markup').before(deleteMsgBtn);
-									$('.quote-msg').find('.edited, .btn-option, .btn-reaction').remove();
-									
-									$('.quote-msg .message-group').append(closeBtn);
-									$('.quote-msg').find('.quote-close').click(function() {
-										self.cancelQuote();
-									});
-									
-									// define a função de clique, pra deletar uma mensagem que você não deseja citar
-									$('.quote-msg').find('.delete-msg-btn')
-										.click(function() {
-											self.removeQuoteAtIndex($('.quote-msg .message').index($('.quote-msg .message').has(this)), () => deleteTooltip.remove());
-										})
-										.on('mouseover.citador', function() {
-											$(".tooltips").append(deleteTooltip);
-											var position = $(this).offset();
-											position.top -= 40;
-											position.left += $(this).width()/2 - deleteTooltip.width()/2 - 13;
-											deleteTooltip.offset(position);
-											$(this).on("mouseout.citador", function () {
-												$(this).off("mouseout.citador");
-												deleteTooltip.remove();
-											});
-										});
-									
-									$('.channelTextArea-1HTP3C').focus();
-
-									if (range) {
-										var startPost = $(range.startContainer).closest('.message'),
-											endPost   = $(range.endContainer).closest('.message');
-											
-										if (thisPost.has(startPost) && thisPost.has(endPost) && startPost.length && endPost.length) {
-											var startI   = thisPost.find(".message").index(startPost),
-												endI     = thisPost.find(".message").index(endPost);
-											
-											if(range.startOffset != range.endOffset || startI != endI) {
-												self.selectionP = {
-													start: {
-														index: startI,
-														offset: range.startOffset
-													},
-													end: {
-														index: endI,
-														offset: range.endOffset
-													}
-												};
-											
-												self.quoteProps.messages.forEach((m, i) => {
-													var msg = $($('.quote-msg .message')[i]).find(".markup");
-													if(endI == startI) msg.text(m.content.substring(range.startOffset, range.endOffset));
-													else if(i == startI) msg.text(m.content.substring(range.startOffset));
-													else if(i == endI) msg.text(m.content.substring(0, range.endOffset));
-													if(i < startI || i > endI) self.removeQuoteAtIndex(i);
-												});
-											}
-										}
+									self.quoteProps = $.extend(true, {}, ReactUtilities.getOwnerInstance(message[0]).props);
+										
+									if (window.getSelection && window.getSelection().rangeCount > 0) {
+										range = window.getSelection().getRangeAt(0);
+									} else if (document.selection && document.selection.type !== 'Control') {
+										range = document.selection.createRange();
 									}
-
-									$('.quote-msg').find(".message")
-										.on('mouseover.citador', function() {
-											$(this).find('.delete-msg-btn').fadeTo(5, 0.4);
-										})
-										.on('mouseout.citador', function() {
-											$(this).find('.delete-msg-btn').fadeTo(5, 0);
+									var thisPost = $(this).closest('.comment');
+									
+									this.createQuote = function() {
+										var messageElem = $(message).clone().hide().appendTo(".quote-msg");
+										self.quoteMsg = $(".quote-msg");
+										
+										$('.quote-msg').find('.citar-btn').toggleClass('quoting');
+										$('.quote-msg').find('.citar-btn').text('');
+										
+										$('.quote-msg').find('.embed').each(function() {
+											$(this).closest('.accessory').remove();
+										});
+										
+										$('.quote-msg').find('.markup').each(function() {
+											if (0 === $(this).text().length + $(this).children().length + $(this).closest(".message").find('.accessory').length) {
+												$(this).closest('.message-text').remove();
+											}
+										});
+										$('.quote-msg').find('.message-content').each(function() {
+											if (0 === $(this).text().length + $(this).children().length + $(this).closest(".message").find('.accessory').length) {
+												$(this).closest('.message-text').remove();
+											}
 										});
 
-									var canEmbed = channel.isPrivate() || mInstance.can(0x4800, {channelId: channel.id});
-									if (!canEmbed) {
-										$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
-										$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
-										$('.quote-msg').find('.citar-btn').text("");
-										$('.quote-msg').find('.citar-btn')
-											.on('mouseover.citador', function() {
-												if ($(this).hasClass('cant-embed')) {
-													$(".tooltips").append(noPermTooltip);
-													var position = $(this).offset();
-													position.top -= 40;
-													position.left += $(this).width()/2 - noPermTooltip.width()/2 - 7;
-													noPermTooltip.offset(position);
-													$(this).on("mouseout.citador", function () {
-														$(this).off("mouseout.citador");
-														noPermTooltip.remove();
+										$('.quote-msg').find('.markup').before('<div class="delete-msg-btn"></div>');
+										$('.quote-msg').find('.edited, .btn-option, .btn-reaction').remove();
+										
+										$('.quote-msg .message-group').append('<div class="quote-close"></div>');
+										$('.quote-msg').find('.quote-close').click(function() {
+											self.cancelQuote();
+										});
+										
+										// define a função de clique, pra deletar uma mensagem que você não deseja citar
+										$('.quote-msg').find('.delete-msg-btn')
+											.click(function() {
+												self.removeQuoteAtIndex($('.quote-msg .message').index($('.quote-msg .message').has(this)), () => deleteTooltip.remove());
+											})
+											.each(function() {
+												new PluginTooltip.Tooltip($(this), self.local.deleteTooltip);
+											});
+										
+										$('.channelTextArea-1HTP3C').focus();
+
+										if (range) {
+											var startPost = $(range.startContainer).closest('.message'),
+												endPost   = $(range.endContainer).closest('.message');
+												
+											if (thisPost.has(startPost) && thisPost.has(endPost) && startPost.length && endPost.length) {
+												var startI   = thisPost.find(".message").index(startPost),
+													endI     = thisPost.find(".message").index(endPost);
+												
+												if(range.startOffset != range.endOffset || startI != endI) {
+													self.selectionP = {
+														start: {
+															index: startI,
+															offset: range.startOffset
+														},
+														end: {
+															index: endI,
+															offset: range.endOffset
+														}
+													};
+												
+													self.quoteProps.messages.forEach((m, i) => {
+														var msg = $($('.quote-msg .message')[i]).find(".markup");
+														if(endI == startI) msg.text(m.content.substring(range.startOffset, range.endOffset));
+														else if(i == startI) msg.text(m.content.substring(range.startOffset));
+														else if(i == endI) msg.text(m.content.substring(0, range.endOffset));
+														if(i < startI || i > endI) self.removeQuoteAtIndex(i);
 													});
 												}
+											}
+										}
+
+										$('.quote-msg').find(".message")
+											.on('mouseover.citador', function() {
+												$(this).find('.delete-msg-btn').fadeTo(5, 0.4);
+											})
+											.on('mouseout.citador', function() {
+												$(this).find('.delete-msg-btn').fadeTo(5, 0);
 											});
-									}
+
+										var canEmbed = channel.isPrivate() || mInstance.can(0x4800, {channelId: channel.id});
+										if (!canEmbed) {
+											$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
+											$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
+											$('.quote-msg').find('.citar-btn').text("");
+											new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), self.local.noPermTooltip, 'red');
+										}
+										
+										messageElem.slideDown(150);
+									};
 									
-									messageElem.slideDown(150);
-								};
-								
-								if ($('.quote-msg .message-group').length > 0)
-									$('.quote-msg .message-group').remove();
-								else
-									$('.channelTextArea-1HTP3C').prepend('<div class="quote-msg"></div>');
-								
-								this.createQuote();
-							});
-					}
-				})
-				.on('mouseleave',function() {
-					if ($(this).find('.citar-btn').length == 1) {
-						$(this).find('.citar-btn').empty().remove();
-					}
-				});
+									if ($('.quote-msg .message-group').length > 0)
+										$('.quote-msg .message-group').remove();
+									else
+										$('.channelTextArea-1HTP3C').prepend('<div class="quote-msg"></div>');
+									
+									this.createQuote();
+								});
+						}
+					})
+					.on('mouseleave',function() {
+						if ($(this).find('.citar-btn').length == 1) {
+							$(this).find('.citar-btn').empty().remove();
+						}
+					});
 			}
 		});
 		this.log(this.local.startMsg, "info");
@@ -261,7 +225,7 @@ class Citador {
 	initialize() {
 		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
 		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
-		PluginUtilities.createSwitchObserver(this);
+		this.switchObserver    = PluginUtilities.onSwitchObserver(this.onSwitch.bind(this));
 		this.MessageParser     = PluginUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
 		this.MessageQueue      = PluginUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
 		this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
@@ -269,7 +233,7 @@ class Citador {
 		this.MainDiscord       = PluginUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
 	}
 
-	removeQuoteAtIndex(i, cb) {
+	removeQuoteAtIndex(i) {
 		if(this.quoteProps) {
 			if(this.quoteProps.messages.filter(m => !m.deleted).length < 2) {
 				this.cancelQuote();
@@ -277,7 +241,6 @@ class Citador {
 				let deleteMsg = $($('.quote-msg .message')[i]);								
 				deleteMsg.find('.message-text, .accessory').hide();		
 				this.quoteProps.messages[i].deleted = true;
-				if(cb && typeof cb == 'function') cb();
 			}
 		} else {
 			this.cancelQuote();
@@ -327,8 +290,7 @@ class Citador {
 								if(i >= start.index && i <= end.index) text += `${endText}\n`;
 							}
 						});
-					}				
-					
+					}
 					// os dados do embed 
 					let embed = {
 							author: {
@@ -413,9 +375,8 @@ class Citador {
 		$('.messages .message-group').off('mouseover');
 		$('.messages .message-group').off('mouseleave');
 		BdApi.clearCSS("citador-css");
+		this.switchObserver.disconnect();
 	}
-	
-	get local       () { return this.locals[document.documentElement.getAttribute('lang').split('-')[0]] || this.locals["default"] }
 	getName         () { return "Citador";                  }
 	getDescription  () { return this.local.description      }
 	getVersion      () { return "1.6.7";                    }
@@ -424,9 +385,9 @@ class Citador {
 	unload          () { this.deleteEverything();      		}
 	stop            () { this.deleteEverything();      		}
 	load            () {                               		}
-	onChannelSwitch () {
-		this.attachParser();
+	onSwitch () {
 		if (this.quoteProps) {
+			this.attachParser();
 			var channel       = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
 				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
 				noPermTooltip = $("<div>").append(this.local.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
