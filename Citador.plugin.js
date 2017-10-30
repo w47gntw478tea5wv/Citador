@@ -15,6 +15,15 @@ class Citador {
 					noPermTooltip: "Sem permissão para citar",
 					attachment: "Anexo"
 				};
+			case 'de':
+				return {
+					description: "Zitiert Leute im Chat",
+					startMsg: "Gestartet",
+					quoteTooltip: "Zitieren",
+					deleteTooltip: "Entfernen",
+					noPermTooltip: "Keine Erlaubnis zum Zitieren",
+					attachment: "Befestigung"
+				}
 			case 'ru': 
 				return {
 					description: "Позволяет цитировать сообщения",
@@ -65,6 +74,7 @@ class Citador {
 	start() {
 		var self = this;
 		$('#zeresLibraryScript').remove();
+		BdApi.clearCSS("citador-css");
 		self.inject('<script>', {
 			type: 'text/javascript',
 			id: 'zeresLibraryScript',
