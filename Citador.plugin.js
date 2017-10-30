@@ -2,56 +2,48 @@
 
 class Citador {
 	get local() {
-		let lang = navigator.language.split('-')[0];
-		if (document.documentElement.getAttribute('lang')) 
-			lang = document.documentElement.getAttribute('lang').split('-')[0];
-		switch (lang) {
-			case 'pt': 
-				return {
-					description: "Cita alguém no chat",
-					startMsg: "Iniciado",
-					quoteTooltip: "Citar",
-					deleteTooltip: "Excluir",
-					noPermTooltip: "Sem permissão para citar",
-					attachment: "Anexo"
-				};
-			case 'de':
-				return {
-					description: "Zitiert Leute im Chat",
-					startMsg: "Gestartet",
-					quoteTooltip: "Zitieren",
-					deleteTooltip: "Entfernen",
-					noPermTooltip: "Keine Erlaubnis zum Zitieren",
-					attachment: "Befestigung"
-				}
-			case 'ru': 
-				return {
-					description: "Позволяет цитировать сообщения",
-					startMsg: "Запущен",
-					quoteTooltip: "Цитировать",
-					deleteTooltip: "Удалить",
-					noPermTooltip: "Нет прав для цитирования",
-					attachment: "Вложение"
-				};
-			case 'ja': 
-				return {
-					description: "誰かをチャットで引用します",
-					startMsg: "起動完了",
-					quoteTooltip: "引用",
-					deleteTooltip: "削除",
-					noPermTooltip: "引用する権限がありません",
-					attachment: "添付ファイル"
-				};
-			default: 
-				return {
-					description: "Quotes somebody in chat",
-					startMsg: "Started",
-					quoteTooltip: "Quote",
-					deleteTooltip: "Delete",
-					noPermTooltip: "No permission to quote",
-					attachment: "Attachment"
-				};
-		}
+		return {
+			pt: {
+				description: "Cita alguém no chat",
+				startMsg: "Iniciado",
+				quoteTooltip: "Citar",
+				deleteTooltip: "Excluir",
+				noPermTooltip: "Sem permissão para citar",
+				attachment: "Anexo"
+			},
+			de: {
+				description: "Zitiert Leute im Chat",
+				startMsg: "Gestartet",
+				quoteTooltip: "Zitieren",
+				deleteTooltip: "Entfernen",
+				noPermTooltip: "Keine Erlaubnis zum Zitieren",
+				attachment: "Befestigung"
+			},
+			ru: {
+				description: "Позволяет цитировать сообщения",
+				startMsg: "Запущен",
+				quoteTooltip: "Цитировать",
+				deleteTooltip: "Удалить",
+				noPermTooltip: "Нет прав для цитирования",
+				attachment: "Вложение"
+			},
+			ja: {
+				description: "誰かをチャットで引用します",
+				startMsg: "起動完了",
+				quoteTooltip: "引用",
+				deleteTooltip: "削除",
+				noPermTooltip: "引用する権限がありません",
+				attachment: "添付ファイル"
+			},
+			default: {
+				description: "Quotes somebody in chat",
+				startMsg: "Started",
+				quoteTooltip: "Quote",
+				deleteTooltip: "Delete",
+				noPermTooltip: "No permission to quote",
+				attachment: "Attachment"
+			}
+		}[$('html').attr('lang').split('-')[0] || 'default'];
 	}
 	
 	log(message, method = 'log') {
@@ -60,6 +52,10 @@ class Citador {
 	
 	inject(element, options) {
 		$('head').append($(element, options));
+	}
+	
+	eject(element) {
+		$(element).remove();
 	}
 	
 	cancelQuote() {
@@ -73,8 +69,8 @@ class Citador {
 	
 	start() {
 		var self = this;
-		$('#zeresLibraryScript').remove();
-		BdApi.clearCSS("citador-css");
+		self.eject('#zeresLibraryScript');
+		self.eject("#citador-css");
 		self.inject('<script>', {
 			type: 'text/javascript',
 			id: 'zeresLibraryScript',
@@ -384,7 +380,7 @@ class Citador {
 		$(document).off("mouseover.citador");
 		$('.messages .message-group').off('mouseover');
 		$('.messages .message-group').off('mouseleave');
-		BdApi.clearCSS("citador-css");
+		this.eject("#citador-css");
 		this.switchObserver.disconnect();
 	}
 	getName         () { return "Citador";                  }

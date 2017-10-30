@@ -23,12 +23,14 @@
 	cursor: default;
 	opacity: 1 !important;
 	background-image: url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_check_white_48px.svg) !important;
+	background-size: 90% !important;
 }
 .citar-btn.cant-embed {
 	background: #f04747;
 	cursor: default;
 	opacity: 1 !important;
 	background-image:url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_close_white_48px.svg) !important;
+	background-size: 90% !important;
 }
 .quote-close {
 	opacity: .5; 
