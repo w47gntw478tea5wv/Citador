@@ -54,7 +54,7 @@ class Citador {
 		$('head').append($(element, options));
 	}
 	
-	eject(element) {
+	remove(element) {
 		$(element).remove();
 	}
 	
@@ -69,8 +69,8 @@ class Citador {
 	
 	start() {
 		var self = this;
-		self.eject('#zeresLibraryScript');
-		self.eject("#citador-css");
+		self.remove('#zeresLibraryScript');
+		self.remove("#citador-css");
 		self.inject('<script>', {
 			type: 'text/javascript',
 			id: 'zeresLibraryScript',
@@ -380,7 +380,7 @@ class Citador {
 		$(document).off("mouseover.citador");
 		$('.messages .message-group').off('mouseover');
 		$('.messages .message-group').off('mouseleave');
-		this.eject("#citador-css");
+		this.remove("#citador-css");
 		this.switchObserver.disconnect();
 	}
 	getName         () { return "Citador";                  }
