@@ -1,24 +1,31 @@
 .citar-btn {
-  cursor: pointer;
-  margin: 0 5px;
-  font-size: 0.7em;
-  padding: 3px 5px;
-  background-color: rgb(10, 10, 10);
-  border-radius: 3px;
-  transition: all 200ms ease-in-out;
-  -webkit-transition: all 200ms ease-in-out;
-  opacity: 0.8;
-  background-image:url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_format_quote_white_24px.svg);
-  background-size: 90%;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: transparent !important;
+	cursor: pointer;
+	margin: 0 5px;
+	font-size: 0.7em;
+	padding: 3px 5px;
+	background-color: rgb(10, 10, 10);
+	border-radius: 3px;
+	transition: all 200ms ease-in-out;
+	-webkit-transition: all 200ms ease-in-out;
+	opacity: 0.8;
+	background-image: url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_format_quote_white_48px.svg);
+	background-size: 90% !important;
+	background-position: center !important;
+	background-repeat: no-repeat !important;
+	color: transparent !important;
 }
 
 .citar-btn.quoting {
-  background: #43b581;
-  cursor: default;
-  opacity: 1 !important;
+	background: #43b581;
+	cursor: default;
+	opacity: 1 !important;
+	background-image: url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_check_white_48px.svg) !important;
+}
+.citar-btn.cant-embed {
+	background: #f04747;
+	cursor: default;
+	opacity: 1 !important;
+	background-image:url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_close_white_48px.svg) !important;
 }
 .quote-close {
   opacity: .5; 
