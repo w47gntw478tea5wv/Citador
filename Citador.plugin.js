@@ -27,6 +27,14 @@ class Citador {
 				noPermTooltip: "引用する権限がありません",
 				attachment: "添付ファイル"
 			},
+			'de': {
+				description: "Zitiert jemanden im Chat",
+				startMsg: "Gestartet",
+				quoteTooltip: "Zitieren",
+				deleteTooltip: "Löschen",
+				noPermTooltip: "Keine Rechte, zu zitieren",
+				attachment: "Anhang"
+			},
 			'default': {
 				description: "Quotes somebody in chat",
 				startMsg: "Started",
