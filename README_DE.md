@@ -32,9 +32,9 @@ Du kannst auch dem [englischen Support Server beitreten](https://discord.gg/tQrd
 
 ### Bekannte Bugs
 - [ ] Globale Emotes / Gilden Emotes werden möglicherweise nicht angezeigt
-- Für dieses werde ich nicht reparieren, sobald Nitros dieses Problem nicht hat
-- Seien Sie nicht überrascht, wenn das Emote nicht funktioniert, es ist keine Schuld des Plugins, sondern Discord's API
-   dass verbotene globale Emotes in Einbettungen (welche Zitate sind im Grunde)
+- Dieses Problem werde ich nicht beheben, solange Nitros es nicht haben
+- Sei nicht überrascht, wenn Emotes nicht funktionieren, es ist keine Schuld des Plugins, sondern Discord's API,
+   die globale Emotes in Embeds, also auch einem Zitat, verbietet.
 
 ### Vorschau
 ![Vorschau](https://i.imgur.com/vWsvdES.gif)
