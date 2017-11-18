@@ -2,7 +2,7 @@
 	cursor: pointer;
 	margin: 0 5px;
 	font-size: 1vh;
-	padding: 3px 5px;
+	padding: 3px 10px;
 	background-color: rgb(10, 10, 10);
 	border-radius: 3px;
 	transition: all 200ms ease-in-out;
@@ -18,19 +18,14 @@
 	font-size: .8vh !important;
 }
 
-.citar-btn.quoting {
-	background: #43b581;
-	cursor: default;
-	opacity: 1 !important;
-	background-image: url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_check_white_48px.svg) !important;
-	background-size: 75% !important;
+.citar-btn.hidden {
+	display: none;
 }
 .citar-btn.cant-embed {
 	background: #f04747;
 	cursor: default;
 	opacity: 1 !important;
 	background-image:url(https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_close_white_48px.svg) !important;
-	background-size: 75% !important;
 }
 .quote-close {
 	opacity: .5; 
