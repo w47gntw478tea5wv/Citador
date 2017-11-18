@@ -62,6 +62,7 @@ class Citador {
 		for (let attr in options)
 			element.setAttribute(attr, options[attr]);
 		document.head.appendChild(element);
+		return element;
 	}
 	
 	remove(element) {
@@ -78,7 +79,7 @@ class Citador {
 	}
 	
 	start() {
-		this.inject('script', {
+		let libraryScript = this.inject('script', {
 			type: 'text/javascript',
 			id: 'zeresLibraryScript',
 			src: 'https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js'
@@ -92,7 +93,7 @@ class Citador {
 
 		if (typeof window.ZeresLibrary !== "undefined") 
 			this.initialize();
-        else 
+		else 
 			libraryScript.addEventListener("load", () => { this.initialize(); });
 	}
 	
