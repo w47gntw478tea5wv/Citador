@@ -2,56 +2,66 @@
 
 class Citador {
 	get local() {
-		return {
-			pt: {
-				description: "Cita alguém no chat",
-				startMsg: "Iniciado",
-				quoteTooltip: "Citar",
-				deleteTooltip: "Excluir",
-				noPermTooltip: "Sem permissão para citar",
-				attachment: "Anexo"
-			},
-			de: {
-				description: "Zitiert Leute im Chat",
-				startMsg: "Gestartet",
-				quoteTooltip: "Zitieren",
-				deleteTooltip: "Entfernen",
-				noPermTooltip: "Keine Erlaubnis zum Zitieren",
-				attachment: "Befestigung"
-			},
-			ru: {
-				description: "Позволяет цитировать сообщения",
-				startMsg: "Запущен",
-				quoteTooltip: "Цитировать",
-				deleteTooltip: "Удалить",
-				noPermTooltip: "Нет прав для цитирования",
-				attachment: "Вложение"
-			},
-			ja: {
-				description: "誰かをチャットで引用します",
-				startMsg: "起動完了",
-				quoteTooltip: "引用",
-				deleteTooltip: "削除",
-				noPermTooltip: "引用する権限がありません",
-				attachment: "添付ファイル"
-			},
-			default: {
-				description: "Quotes somebody in chat",
-				startMsg: "Started",
-				quoteTooltip: "Quote",
-				deleteTooltip: "Delete",
-				noPermTooltip: "No permission to quote",
-				attachment: "Attachment"
-			}
-		}[$('html').attr('lang').split('-')[0] || 'default'];
+		switch (document.documentElement.getAttribute('lang').split('-')[0]) {
+			case 'pt':
+				return {
+					description: "Cita alguém no chat",
+					startMsg: "Iniciado",
+					quoteTooltip: "Citar",
+					deleteTooltip: "Excluir",
+					noPermTooltip: "Sem permissão para citar",
+					attachment: "Anexo"
+				};
+			case 'de': 
+				return {
+					description: "Zitiert jemanden im Chat",
+					startMsg: "Gestartet",
+					quoteTooltip: "Zitieren",
+					deleteTooltip: "Löschen",
+					noPermTooltip: "Keine Rechte, zu zitieren",
+					attachment: "Anhang"
+				};
+			case 'ru': 
+				return {
+					description: "Позволяет цитировать сообщения",
+					startMsg: "Запущен",
+					quoteTooltip: "Цитировать",
+					deleteTooltip: "Удалить",
+					noPermTooltip: "Нет прав для цитирования",
+					attachment: "Вложение"
+					};
+			case 'ja': 
+				return {
+					description: "誰かをチャットで引用します",
+					startMsg: "起動完了",
+					quoteTooltip: "引用",
+					deleteTooltip: "削除",
+					noPermTooltip: "引用する権限がありません",
+					attachment: "添付ファイル"
+				};
+			default: 
+				return {
+					description: "Quotes somebody in chat",
+					startMsg: "Started",
+					quoteTooltip: "Quote",
+					deleteTooltip: "Delete",
+					noPermTooltip: "No permission to quote",
+					attachment: "Attachment"
+				};
+		};
 	}
 	
 	log(message, method = 'log') {
 		console[method](`[${this.getName()}]`, message);
 	}
 	
-	inject(element, options) {
-		$('head').append($(element, options));
+	inject(name, options) {
+		let element = document.getElementById(options.id);
+		if (element) element.parentElement.removeChild(element);
+		element = document.createElement(name);
+		for (let attr in options)
+			element.setAttribute(attr, options[attr]);
+		document.head.appendChild(element);
 	}
 	
 	remove(element) {
@@ -68,26 +78,34 @@ class Citador {
 	}
 	
 	start() {
-		var self = this;
-		self.remove('#zeresLibraryScript');
-		self.remove("#citador-css");
-		self.inject('<script>', {
+		this.inject('script', {
 			type: 'text/javascript',
 			id: 'zeresLibraryScript',
 			src: 'https://rauenzi.github.io/BetterDiscordAddons/Plugins/PluginLibrary.js'
 		});
-		self.inject('<link>', {
+		this.inject('link', {
 			type: 'text/css',
 			id: 'citador-css',
 			rel: 'stylesheet',
 			href: 'https://rawgit.com/nirewen/Citador/quote-btn/Citador.styles.css'
 		});
-		
+
 		if (typeof window.ZeresLibrary !== "undefined") 
 			this.initialize();
-		else 
-			$('#zeresLibraryScript').on("load", () => self.initialize());
-		
+        else 
+			libraryScript.addEventListener("load", () => { this.initialize(); });
+	}
+	
+	initialize() {
+		let self = this;
+		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
+		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
+		this.switchObserver    = PluginUtilities.createSwitchObserver(this);
+		this.MessageParser     = PluginUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
+		this.MessageQueue      = PluginUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
+		this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
+		this.EventDispatcher   = PluginUtilities.WebpackModules.findByUniqueProperties(["dispatch"]);
+		this.MainDiscord       = PluginUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
 		$(document).on("mouseover.citador", function(e) {
 			var target = $(e.target);
 			if (target.parents(".message").length > 0) {
@@ -95,8 +113,8 @@ class Citador {
 					.on('mouseover', function() {
 						if ($(this).find('.citar-btn').length == 0) {
 							$('.messages .message-group').hasClass('compact') 
-								? $(this).find('.timestamp').first().prepend('<span class="citar-btn"></span>') 
-								: $(this).find($('.messages .message-group .comment .body h2')).append('<span class="citar-btn"></span>');
+								? $(this).find('.timestamp').first().prepend('<span class="citar-btn"></span>') 
+								: $(this).find($('.messages .message-group .comment .body h2')).append('<span class="citar-btn"></span>');
 								
 							new PluginTooltip.Tooltip($(this).find('.citar-btn'), self.local.quoteTooltip);
 							$(this).find('.citar-btn')
@@ -122,8 +140,7 @@ class Citador {
 										var messageElem = $(message).clone().hide().appendTo(".quote-msg");
 										self.quoteMsg = $(".quote-msg");
 										
-										$('.quote-msg').find('.citar-btn').toggleClass('quoting');
-										$('.quote-msg').find('.citar-btn').text('');
+										$('.quote-msg').find('.citar-btn').toggleClass('hidden');
 										
 										$('.quote-msg').find('.embed').each(function() {
 											$(this).closest('.accessory').remove();
@@ -200,9 +217,7 @@ class Citador {
 
 										var canEmbed = channel.isPrivate() || mInstance.can(0x4800, {channelId: channel.id});
 										if (!canEmbed) {
-											$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
-											$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
-											$('.quote-msg').find('.citar-btn').text("");
+											$('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
 											new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), self.local.noPermTooltip, 'red');
 										}
 										
@@ -226,17 +241,6 @@ class Citador {
 			}
 		});
 		this.log(this.local.startMsg, "info");
-	}
-	
-	initialize() {
-		PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/pt/Citador.plugin.js");
-		PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
-		this.switchObserver    = PluginUtilities.onSwitchObserver(this.onSwitch.bind(this));
-		this.MessageParser     = PluginUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
-		this.MessageQueue      = PluginUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
-		this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
-		this.EventDispatcher   = PluginUtilities.WebpackModules.findByUniqueProperties(["dispatch"]);
-		this.MainDiscord       = PluginUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
 	}
 
 	removeQuoteAtIndex(i) {
@@ -307,7 +311,7 @@ class Citador {
 							footer: {
 								text: `in ${chName}${atServer}`
 							},
-							color: color,
+							color,
 							timestamp: msg.timestamp.toISOString()
 						},
 						attachments = messages.map(m => m.attachments).reduce((a, b) => a.concat(b));
@@ -320,7 +324,7 @@ class Citador {
 						
 						// checar se tem algum arquivo na mensagem citada, e adicionar ao embed final
 						var otherAt = attachments.filter(a => !a.width);
-						if(otherAt.length >= 1) {
+						if (otherAt.length >= 1) {
 							embed.fields = [];
 							otherAt.forEach((at, i) => {
 								var emoji = '📁';
@@ -345,7 +349,7 @@ class Citador {
 							content: msgCnt.content,
 							tts: false,
 							nonce: msg.id,
-							embed: embed
+							embed
 						}
 					}, function(r) {
 						r.ok ? (self.MessageController.receiveMessage(cc.id, r.body)) : (r.status >= 400 && r.status < 500 && r.body && self.MessageController.sendClydeError(cc.id, r.body.code),
@@ -370,9 +374,8 @@ class Citador {
 		};
 		el[0].addEventListener("keydown", this.handleKeypress, false);
 		el[0].addEventListener("keyup", function(e) {
-			if (e.keyCode == 27 && self.quoteProps) {
+			if (e.keyCode == 27 && self.quoteProps)
 				self.cancelQuote();
-			}
 		}, false);
 	}
 	
@@ -383,45 +386,27 @@ class Citador {
 		this.remove("#citador-css");
 		this.switchObserver.disconnect();
 	}
-	getName         () { return "Citador";                  }
-	getDescription  () { return this.local.description      }
-	getVersion      () { return "1.6.7";                    }
-	getAuthor       () { return "Nirewen";             		}
-	getSettingsPanel() { return "";                    		}
-	unload          () { this.deleteEverything();      		}
-	stop            () { this.deleteEverything();      		}
-	load            () {                               		}
-	onSwitch () {
+	getName         () { return "Citador";            }
+	getDescription  () { return this.local.description}
+	getVersion      () { return "1.6.7";              }
+	getAuthor       () { return "Nirewen";            }
+	getSettingsPanel() { return "";                   }
+	unload          () { this.deleteEverything();     }
+	stop            () { this.deleteEverything();     }
+	load            () {                              }
+	onChannelSwitch () {
 		if (this.quoteProps) {
 			this.attachParser();
-			var channel       = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
-				canEmbed      = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id}),
-				noPermTooltip = $("<div>").append(this.local.noPermTooltip).addClass("tooltip tooltip-top tooltip-red citador");
+			var channel  = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]),
+				canEmbed = channel.props.channel.isPrivate() || channel.can(0x4800, {channelId: channel.props.channel.id});
+			
+			$('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
 			
 			if (!canEmbed) {
-				$('.quote-msg').find('.citar-btn:not(.quoting).cant-embed').toggleClass('quoting', 'cant-embed');
-				$('.quote-msg').find('.citar-btn:not(.cant-embed)').toggleClass('cant-embed');
-				$('.quote-msg').find('.citar-btn').text("");
-				$('.quote-msg').find('.citar-btn')
-					.on('mouseover.citador', function() {
-						if ($(this).hasClass('cant-embed')) {
-							$(".tooltips").append(noPermTooltip);
-							var position = $(this).offset();
-							position.top -= 40;
-							position.left += $(this).width()/2 - noPermTooltip.width()/2 - 7;
-							noPermTooltip.offset(position);
-							$(this).on("mouseout.citador", function () {
-								$(this).off("mouseout.citador");
-								noPermTooltip.remove();
-							});
-						}
-					});
-			} else {
-				$('.quote-msg').find('.citar-btn:not(.quoting)').toggleClass('quoting');
-				$('.quote-msg').find('.citar-btn.cant-embed').toggleClass('cant-embed');
-				$('.quote-msg').find('.citar-btn').text("");
-			}
-			$('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
+				$('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
+				new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noPermTooltip, 'red');
+			} else
+				$('.quote-msg').find('.citar-btn:not(.hidden).cant-embed').toggleClass('hidden cant-embed');
 		}
 	}
 }
