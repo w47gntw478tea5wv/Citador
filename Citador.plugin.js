@@ -51,33 +51,6 @@ class Citador {
 		};
 	}
 	
-	log(message, method = 'log') {
-		console[method](`[${this.getName()}]`, message);
-	}
-	
-	inject(name, options) {
-		let element = document.getElementById(options.id);
-		if (element) element.parentElement.removeChild(element);
-		element = document.createElement(name);
-		for (let attr in options)
-			element.setAttribute(attr, options[attr]);
-		document.head.appendChild(element);
-		return element;
-	}
-	
-	remove(element) {
-		$(element).remove();
-	}
-	
-	cancelQuote() {
-		$('.quote-msg').slideUp(300, () => $('.quote-msg').remove());
-		$('.tooltip.citador').remove();
-		this.quoteMsg   = null;
-		this.quoteProps.messages.forEach(m => m.deleted = null);
-		this.quoteProps = null;
-		this.selectionP = null;
-	}
-	
 	start() {
 		let libraryScript = this.inject('script', {
 			type: 'text/javascript',
@@ -107,6 +80,8 @@ class Citador {
 		this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
 		this.EventDispatcher   = PluginUtilities.WebpackModules.findByUniqueProperties(["dispatch"]);
 		this.MainDiscord       = PluginUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
+		this.HistoryUtils      = PluginUtilities.WebpackModules.findByUniqueProperties(['transitionTo', 'replaceWith', 'getHistory']);
+		this.patchExternalLinks();
 		$(document).on("mouseover.citador", function(e) {
 			var target = $(e.target);
 			if (target.parents(".message").length > 0) {
@@ -243,20 +218,6 @@ class Citador {
 		});
 		this.log(this.local.startMsg, "info");
 	}
-
-	removeQuoteAtIndex(i) {
-		if(this.quoteProps) {
-			if(this.quoteProps.messages.filter(m => !m.deleted).length < 2) {
-				this.cancelQuote();
-			} else {
-				let deleteMsg = $($('.quote-msg .message')[i]);								
-				deleteMsg.find('.message-text, .accessory').hide();		
-				this.quoteProps.messages[i].deleted = true;
-			}
-		} else {
-			this.cancelQuote();
-		}
-	}
 	
 	attachParser() {
 		var el   = $('.channelTextArea-1HTP3C'),
@@ -308,6 +269,7 @@ class Citador {
 								name: msg.nick || author.username,
 								icon_url: avatarURL.startsWith("https://") ? avatarURL : `https://discordapp.com/${avatarURL}`
 							},
+							url: `${self.quoteURL}guild_id=${msgG.id}&channel_id=${msgC.id}&message_id=${msg.id}`,
 							description: text,
 							footer: {
 								text: `in ${chName}${atServer}`
@@ -378,6 +340,58 @@ class Citador {
 			if (e.keyCode == 27 && self.quoteProps)
 				self.cancelQuote();
 		}, false);
+	}
+	
+	patchExternalLinks() {
+		const self = this,
+			ExternalLink = PluginUtilities.WebpackModules.find(a => a.prototype && a.prototype.onClick).prototype;
+		ExternalLink.oldOnClick = ExternalLink.onClick;
+		ExternalLink.onClick = function(e) {
+			const t = this.props;
+			if (t.href.startsWith(self.quoteURL)) {
+				e.preventDefault();
+				const querystring = require('querystring');
+				const {guild_id, channel_id, message_id} = querystring.parse(t.href.substring(self.quoteURL.length));
+				self.HistoryUtils.transitionTo(self.MainDiscord.Routes.MESSAGE(guild_id, channel_id, message_id))
+			} else 
+				this.oldOnClick(e);
+		}
+	}
+	
+	constructor() {
+		this.quoteURL = 'https://github.com/nirewen/Citador?';
+		this.log = (message, method = 'log') => console[method](`[${this.getName()}]`, message);
+		this.inject = (name, options) => {
+			let element = document.getElementById(options.id);
+			if (element) element.parentElement.removeChild(element);
+			element = document.createElement(name);
+			for (let attr in options)
+				element.setAttribute(attr, options[attr]);
+			document.head.appendChild(element);
+			return element;
+		};
+		this.remove = (element) => $(element).remove();
+	}
+	
+	removeQuoteAtIndex(i) {
+		if (this.quoteProps) {
+			if (this.quoteProps.messages.filter(m => !m.deleted).length < 2)
+				this.cancelQuote();
+			else {
+				let deleteMsg = $($('.quote-msg .message')[i]);								
+				deleteMsg.find('.message-text, .accessory').hide();		
+				this.quoteProps.messages[i].deleted = true;
+			}
+		} else
+			this.cancelQuote();
+	}
+	
+	cancelQuote() {
+		$('.quote-msg').slideUp(300, () => $('.quote-msg').remove());
+		this.quoteMsg   = null;
+		this.quoteProps.messages.forEach(m => m.deleted = null);
+		this.quoteProps = null;
+		this.selectionP = null;
 	}
 	
 	deleteEverything() {
