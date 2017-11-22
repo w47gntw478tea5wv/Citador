@@ -60,21 +60,17 @@
 .citador-guilds .guild {
   display: inline-block;
 }
-.citador-guilds .avatar-small .indicator {
-  transition: background-color 0.05s ease-in-out;
-  display: inline-block;
-  background-clip: padding-box;
-  flex-shrink: 0;
-  bottom: -2px;
-  right: -4px;
-  background-color: #43b581;
-  border: 2px solid #2f3136;
-  border-radius: 7px;
-  pointer-events: none;
-  position: absolute;
-  width: 14px !important; 
-  height: 14px !important;
+.citador-guilds .avatar-small {
+  transition: filter 10ms ease-in-out;
+  width: 30px;
+  height: 30px; 
+  line-height: 30px; 
+  font-size: 9.6px;
+  text-align: center; 
+  color: #fff;
+  display: block;
+  background-color: #2f3136;
 }
-.citador-guilds .avatar-small .indicator.disabled {
-  background-color: #f04747;
+.citador-guilds .avatar-small.disabled {
+  filter: grayscale(1) brightness(0.6);
 }
