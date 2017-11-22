@@ -10,14 +10,14 @@ class Citador {
           quoteTooltip: "Citar",
           deleteTooltip: "Excluir",
           noPermTooltip: "Sem permissão para citar",
-					noChatTooltip: "Sem permissão para enviar mensagens",
+          noChatTooltip: "Sem permissão para enviar mensagens",
           attachment: "Anexo",
-					settings: {
-						useFallbackCodeblock: {
-							title: "Usar citação em formato de bloco de código",
-							choices: ["Nunca", "Sempre", "Somente quando sem permissão"]
-						}
-					}
+          settings: {
+            useFallbackCodeblock: {
+              title: "Usar citação em formato de bloco de código",
+              choices: ["Nunca", "Sempre", "Somente quando sem permissão"]
+            }
+          }
         };
       case 'de': 
         return {
@@ -26,14 +26,14 @@ class Citador {
           quoteTooltip: "Zitieren",
           deleteTooltip: "Löschen",
           noPermTooltip: "Keine Rechte, zu zitieren",
-					noChatTooltip: "No permission to send messages",
+          noChatTooltip: "No permission to send messages",
           attachment: "Anhang",
-					settings: {
-						useFallbackCodeblock: {
-							title: "Use codeblock quote format",
-							choices: ["Never", "Always", "Only when without permission"]
-						}
-					}
+          settings: {
+            useFallbackCodeblock: {
+              title: "Use codeblock quote format",
+              choices: ["Never", "Always", "Only when without permission"]
+            }
+          }
         };
       case 'ru': 
         return {
@@ -42,14 +42,14 @@ class Citador {
           quoteTooltip: "Цитировать",
           deleteTooltip: "Удалить",
           noPermTooltip: "Нет прав для цитирования",
-					noChatTooltip: "No permission to send messages",
+          noChatTooltip: "No permission to send messages",
           attachment: "Вложение",
-					settings: {
-						useFallbackCodeblock: {
-							title: "Use codeblock quote format",
-							choices: ["Never", "Always", "Only when without permission"]
-						}
-					}
+          settings: {
+            useFallbackCodeblock: {
+              title: "Use codeblock quote format",
+              choices: ["Never", "Always", "Only when without permission"]
+            }
+          }
         };
       case 'ja': 
         return {
@@ -58,14 +58,14 @@ class Citador {
           quoteTooltip: "引用",
           deleteTooltip: "削除",
           noPermTooltip: "引用する権限がありません",
-					noChatTooltip: "No permission to send messages",
+          noChatTooltip: "No permission to send messages",
           attachment: "添付ファイル",
-					settings: {
-						useFallbackCodeblock: {
-							title: "Use codeblock quote format",
-							choices: ["Never", "Always", "Only when without permission"]
-						}
-					}
+          settings: {
+            useFallbackCodeblock: {
+              title: "Use codeblock quote format",
+              choices: ["Never", "Always", "Only when without permission"]
+            }
+          }
         };
       default: 
         return {
@@ -74,14 +74,14 @@ class Citador {
           quoteTooltip: "Quote",
           deleteTooltip: "Delete",
           noPermTooltip: "No permission to quote",
-					noChatTooltip: "No permission to send messages",
+          noChatTooltip: "No permission to send messages",
           attachment: "Attachment",
-					settings: {
-						useFallbackCodeblock: {
-							title: "Use codeblock quote format",
-							choices: ["Never", "Always", "Only when without permission"]
-						}
-					}
+          settings: {
+            useFallbackCodeblock: {
+              title: "Use codeblock quote format",
+              choices: ["Never", "Always", "Only when without permission"]
+            }
+          }
         };
     };
   }
@@ -593,14 +593,14 @@ class Citador {
       
       $('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
       
-			if (!this.canChat()) {
-				$('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
-				new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noChatTooltip, 'red');
-			}
-			else if (!this.canEmbed() && this.settings.useFallbackCodeblock == 0) {
-				$('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
-				new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noPermTooltip, 'red');
-			} else
+      if (!this.canChat()) {
+        $('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
+        new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noChatTooltip, 'red');
+      }
+      else if (!this.canEmbed() && this.settings.useFallbackCodeblock == 0) {
+        $('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
+        new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noPermTooltip, 'red');
+      } else
         $('.quote-msg').find('.citar-btn:not(.hidden).cant-embed').toggleClass('hidden cant-embed');
     }
   }
