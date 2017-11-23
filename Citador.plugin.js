@@ -123,6 +123,8 @@ class Citador {
   
   constructor() {
     this.quoteURL = 'https://github.com/nirewen/Citador?';
+    this.CDN_URL = 'https://cdn.discordapp.com/avatars/';
+    this.ASSETS_URL = 'https://discordapp.com';
     this.log = (message, method = 'log') => console[method](`[${this.getName()}]`, message);
     this.inject = (name, options) => {
       let element = document.getElementById(options.id);
@@ -384,24 +386,26 @@ class Citador {
   }
   
   sendEmbedQuote(e) {
-    var props = this.quoteProps, self = this;
+    var props = this.quoteProps;
     if (props) {
       if (e.shiftKey || $('.autocomplete-1TnWNR').length >= 1) return;
     
       var messages  = props.messages.filter(m => !m.deleted),
-        guilds    = this.guilds,
-        msg      = props.messages[0],
-        cc        = ReactUtilities.getOwnerInstance($("form")[0]).props.channel,
-        msgC      = props.channel,
-        msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
-        
-        author    = msg.author,
-        avatarURL = author.getAvatarURL(),
-        color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
-        msgCnt    = this.MessageParser.parse(cc, $('.channelTextArea-1HTP3C textarea').val()),
-        text      = messages.map(m => m.content).join('\n'),
-        atServer  = msgC.guild_id && msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
-        chName    = msgC.isDM() ? `@${msgC._getUsers()[0].username}` : msgC.isGroupDM() ? `${msgC.name}` : `#${msgC.name}`;
+          guilds    = this.guilds,
+          msg       = props.messages[0],
+          cc        = ReactUtilities.getOwnerInstance($("form")[0]).props.channel,
+          msgC      = props.channel,
+          msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
+          
+          author    = msg.author,
+          avatarURL = author.getAvatarURL().startsWith(this.CDN_URL) 
+                        ? author.getAvatarURL() 
+                        : this.ASSETS_URL + author.getAvatarURL(),
+          color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
+          msgCnt    = this.MessageParser.parse(cc, $('.channelTextArea-1HTP3C textarea').val()),
+          text      = messages.map(m => m.content).join('\n'),
+          atServer  = msgC.guild_id && msgC.guild_id != cc.guild_id ? ` at ${msgG.name}` : '',
+          chName    = msgC.isDM() ? `@${msgC._getUsers()[0].username}` : msgC.isGroupDM() ? `${msgC.name}` : `#${msgC.name}`;
           
       if (this.selectionP) {
         var start = this.selectionP.start,
@@ -465,8 +469,8 @@ class Citador {
           nonce: msg.id,
           embed
         }
-      }, function(r) {
-        r.ok ? (self.MessageController.receiveMessage(cc.id, r.body)) : (r.status >= 400 && r.status < 500 && r.body && this.MessageController.sendClydeError(cc.id, r.body.code),
+      }, r => {
+        r.ok ? (this.MessageController.receiveMessage(cc.id, r.body)) : (r.status >= 400 && r.status < 500 && r.body && this.MessageController.sendClydeError(cc.id, r.body.code),
         this.EventDispatcher.dispatch({
           type: this.MainDiscord.ActionTypes.MESSAGE_SEND_FAILED,
           messageId: msg.id,
@@ -496,7 +500,6 @@ class Citador {
         msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
         
         author    = msg.author,
-        avatarURL = author.getAvatarURL(),
         color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
         content   = this.MessageParser.parse(cc, $('.channelTextArea-1HTP3C textarea').val()).content,
         text      = messages.map(m => m.content).join('\n'),
@@ -629,9 +632,11 @@ class Citador {
       context = elem.classList.contains('context-menu') ? elem : elem.querySelector('.context-menu');
     if (!context) return;
     
-    if (!ReactUtilities.getReactProperty(context, "return.memoizedProps.guild")) return;
+    let props = ReactUtilities.getReactProperty(context, "return.memoizedProps.guild");
     
-    let {id} = ReactUtilities.getReactProperty(context, "return.memoizedProps.guild");
+    if (!props) return;
+    
+    let {id} = props;
     $(context).find('.item').first().after(
       $(new PluginContextMenu.ToggleItem(this.local.settings.disableServers.context, !this.settings.disabledServers.includes(id), {
         callback: e => {
