@@ -1,6 +1,9 @@
 //META{"name":"Citador"}*//
 
 class Citador {
+  
+  /** LOCALE **/
+  
   get local() {
     switch (document.documentElement.getAttribute('lang').split('-')[0]) {
       case 'pt':
@@ -10,14 +13,20 @@ class Citador {
           quoteTooltip: "Citar",
           deleteTooltip: "Excluir",
           noPermTooltip: "Sem permissão para citar",
-          noChatTooltip: "Sem permissão para enviar mensagens",
+					noChatTooltip: "Sem permissão para enviar mensagens",
           attachment: "Anexo",
-          settings: {
-            useFallbackCodeblock: {
-              title: "Usar citação em formato de bloco de código",
-              choices: ["Nunca", "Sempre", "Somente quando sem permissão"]
-            }
-          }
+					settings: {
+						useFallbackCodeblock: {
+							title: "Usar citação em formato de bloco de código",
+							choices: ["Nunca", "Sempre", "Somente quando sem permissão"]
+						},
+            disableServers: {
+              title: "Desabilitar citação em embed para servidores específicos",
+              description: "Clique em um servidor para desabilitar citações em embed para ele. Clique novamente para habilitar.</br>Você também pode clicar com o botão direito em um servidor e habilitar ou desabilitar por lá.",
+              context: "Citação em embed"
+            },
+            reset: 'Redefinir configurações'
+					}
         };
       case 'de': 
         return {
@@ -26,14 +35,20 @@ class Citador {
           quoteTooltip: "Zitieren",
           deleteTooltip: "Löschen",
           noPermTooltip: "Keine Rechte, zu zitieren",
-          noChatTooltip: "No permission to send messages",
+					noChatTooltip: "No permission to send messages",
           attachment: "Anhang",
-          settings: {
-            useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
-            }
-          }
+					settings: {
+						useFallbackCodeblock: {
+							title: "Use codeblock quote format",
+							choices: ["Never", "Always", "Only when without permission"]
+						},
+            disableServers: {
+              title: "Disable embed quotes for specific servers",
+              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
+              context: "Embed quotes"
+            },
+            reset: 'Reset settings'
+					}
         };
       case 'ru': 
         return {
@@ -42,14 +57,20 @@ class Citador {
           quoteTooltip: "Цитировать",
           deleteTooltip: "Удалить",
           noPermTooltip: "Нет прав для цитирования",
-          noChatTooltip: "No permission to send messages",
+					noChatTooltip: "No permission to send messages",
           attachment: "Вложение",
-          settings: {
-            useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
-            }
-          }
+					settings: {
+						useFallbackCodeblock: {
+							title: "Use codeblock quote format",
+							choices: ["Never", "Always", "Only when without permission"]
+						},
+            disableServers: {
+              title: "Disable embed quotes for specific servers",
+              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
+              context: "Embed quotes"
+            },
+            reset: 'Reset settings'
+					}
         };
       case 'ja': 
         return {
@@ -58,14 +79,20 @@ class Citador {
           quoteTooltip: "引用",
           deleteTooltip: "削除",
           noPermTooltip: "引用する権限がありません",
-          noChatTooltip: "No permission to send messages",
+					noChatTooltip: "No permission to send messages",
           attachment: "添付ファイル",
-          settings: {
-            useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
-            }
-          }
+					settings: {
+						useFallbackCodeblock: {
+							title: "Use codeblock quote format",
+							choices: ["Never", "Always", "Only when without permission"]
+						},
+            disableServers: {
+              title: "Disable embed quotes for specific servers",
+              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
+              context: "Embed quotes"
+            },
+            reset: 'Reset settings'
+					}
         };
       default: 
         return {
@@ -74,19 +101,66 @@ class Citador {
           quoteTooltip: "Quote",
           deleteTooltip: "Delete",
           noPermTooltip: "No permission to quote",
-          noChatTooltip: "No permission to send messages",
+					noChatTooltip: "No permission to send messages",
           attachment: "Attachment",
-          settings: {
-            useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
-            }
-          }
+					settings: {
+						useFallbackCodeblock: {
+							title: "Use codeblock quote format",
+							choices: ["Never", "Always", "Only when without permission"]
+						},
+            disableServers: {
+              title: "Disable embed quotes for specific servers",
+              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
+              context: "Embed quotes"
+            },
+            reset: 'Reset settings'
+					}
         };
     };
   }
   
-  start() {
+  /** MAIN **/
+  
+  constructor() {
+    this.quoteURL = 'https://github.com/nirewen/Citador?';
+    this.log = (message, method = 'log') => console[method](`[${this.getName()}]`, message);
+    this.inject = (name, options) => {
+      let element = document.getElementById(options.id);
+      if (element) element.parentElement.removeChild(element);
+      element = document.createElement(name);
+      for (let attr in options)
+        element.setAttribute(attr, options[attr]);
+      document.head.appendChild(element);
+      return element;
+    };
+    this.remove = (element) => {
+      let elem = document.getElementById(element);
+      if (elem)
+        elem.parentElement.removeChild(elem);
+    };
+    this.contextObserver = new MutationObserver((changes) => {
+			for (let change in changes) 
+        this.observeContextMenus(changes[change]);
+		});
+  }
+  
+  get defaultSettings() {
+    return {
+      useFallbackCodeblock: 0,
+      disabledServers: []
+    }
+  }
+  
+  /** BD FUNCTIONS **/
+  
+  getName         () { return "Citador";            }
+  getDescription  () { return this.local.description}
+  getVersion      () { return "1.7";                }
+  getAuthor       () { return "Nirewen";            }
+  unload          () { this.deleteEverything();     }
+  stop            () { this.deleteEverything();     }
+  load            () {                              }
+  start           () {
     let libraryScript = this.inject('script', {
       type: 'text/javascript',
       id: 'zeresLibraryScript',
@@ -96,7 +170,7 @@ class Citador {
       type: 'text/css',
       id: 'citador-css',
       rel: 'stylesheet',
-      href: 'https://rawgit.com/nirewen/Citador/quote-btn/Citador.styles.css'
+      href: 'https://rawgit.com/nirewen/Citador/master/Citador.styles.css'
     });
 
     if (typeof window.ZeresLibrary !== "undefined") 
@@ -118,6 +192,7 @@ class Citador {
     this.HistoryUtils      = PluginUtilities.WebpackModules.findByUniqueProperties(['transitionTo', 'replaceWith', 'getHistory']);
     this.moment            = PluginUtilities.WebpackModules.findByUniqueProperties(['parseZone']);
     this.initialized       = true;
+    this.contextObserver.observe(document.querySelector('.app'), {childList: true, subtree: true});
     this.loadSettings();
   
     this.patchExternalLinks();
@@ -227,8 +302,8 @@ class Citador {
                       })
                       .on('mouseout.citador', function() {
                         $(this).find('.delete-msg-btn').fadeTo(5, 0);
-                      });
-                      
+                      });                 
+                    
                     if (!self.canChat()) {
                       $('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
                       new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), self.local.noChatTooltip, 'red');
@@ -260,14 +335,28 @@ class Citador {
     this.log(this.local.startMsg, "info");
   }
   
-  canEmbed() {
-    const channel = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]);
-    return channel.props.channel.isPrivate() || channel.can(0x4000, {channelId: channel.props.channel.id});
+  onChannelSwitch () {
+    if (this.quoteProps) {
+      this.attachParser();
+      
+      $('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
+      
+			if (!this.canChat()) {
+				$('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
+				new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noChatTooltip, 'red');
+			}
+			else if (!this.canEmbed() && this.settings.useFallbackCodeblock == 0) {
+				$('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
+				new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noPermTooltip, 'red');
+			} else
+        $('.quote-msg').find('.citar-btn:not(.hidden).cant-embed').toggleClass('hidden cant-embed');
+    }
   }
   
-  canChat() {
-    const channel = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]);
-    return channel.props.channel.isPrivate() || channel.can(0x800, {channelId: channel.props.channel.id});
+  getSettingsPanel() {
+    let panel = $("<form>").addClass("form citador").css("width", "100%");
+    if (this.initialized) this.generateSettings(panel);
+    return panel[0];
   }
   
   attachParser() {
@@ -279,7 +368,7 @@ class Citador {
       if (code !== 13) return;
       
       try {
-        if (this.settings.useFallbackCodeblock == 1 || !this.canEmbed() && this.settings.useFallbackCodeblock == 2)
+        if (this.settings.useFallbackCodeblock == 1 || !this.canEmbed() && this.settings.useFallbackCodeblock == 2 || this.settings.disabledServers.includes(PluginUtilities.getCurrentServer()))
           this.sendTextQuote(e);
         else
           this.sendEmbedQuote(e);
@@ -329,7 +418,7 @@ class Citador {
           }
         });
       }
-      // os dados do embed 
+      
       let embed = {
           author: {
             name: msg.nick || author.username,
@@ -346,12 +435,10 @@ class Citador {
         attachments = messages.map(m => m.attachments).reduce((a, b) => a.concat(b));
             
       if (attachments.length >= 1) {
-        // checar se tem alguma imagem na mensagem citada, e adicionar ao embed final
         var imgAt = attachments.filter(a => a.width);
         if(imgAt.length >= 1)
           embed.image = {url: attachments[0].url};
         
-        // checar se tem algum arquivo na mensagem citada, e adicionar ao embed final
         var otherAt = attachments.filter(a => !a.width);
         if (otherAt.length >= 1) {
           embed.fields = [];
@@ -366,11 +453,9 @@ class Citador {
           });
         }
       }
-          
-      // cria uma mensagem com o conteúdo desejado (é necessário pra validar um "id")
+      
       var msg = this.MessageParser.createMessage(cc.id, msgCnt.content);
-        
-      // adiciona a mensagem a lista de mensagens que serão enviadas
+      
       this.MessageQueue.enqueue({
         type: "send",
         message: {
@@ -469,24 +554,6 @@ class Citador {
     }
   }
   
-  constructor() {
-    this.quoteURL = 'https://github.com/nirewen/Citador?';
-    this.log = (message, method = 'log') => console[method](`[${this.getName()}]`, message);
-    this.inject = (name, options) => {
-      let element = document.getElementById(options.id);
-      if (element) element.parentElement.removeChild(element);
-      element = document.createElement(name);
-      for (let attr in options)
-        element.setAttribute(attr, options[attr]);
-      document.head.appendChild(element);
-      return element;
-    };
-    this.remove = (element) => $(element).remove();
-    this.defaultSettings = {
-      useFallbackCodeblock: 0
-    }
-  }
-  
   removeQuoteAtIndex(i) {
     if (this.quoteProps) {
       if (this.quoteProps.messages.filter(m => !m.deleted).length < 2)
@@ -508,17 +575,37 @@ class Citador {
     this.selectionP = null;
   }
   
+  /** UTILS **/
+  
+  canEmbed() {
+    const channel = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]);
+    return channel.props.channel.isPrivate() || channel.can(0x4000, {channelId: channel.props.channel.id});
+  }
+  
+  canChat() {
+    const channel = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]);
+    return channel.props.channel.isPrivate() || channel.can(0x800, {channelId: channel.props.channel.id});
+  }
+  
   deleteEverything() {
     $(document).off("mouseover.citador");
     $('.messages .message-group').off('mouseover');
     $('.messages .message-group').off('mouseleave');
-    this.remove("#citador-css");
+    this.remove("citador-css");
     this.switchObserver.disconnect();
+    this.contextObserver.disconnect();
     this.initialized = false;
   }
   
   get guilds () { 
     return ReactUtilities.getOwnerInstance($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild);
+  }
+  
+  getIconTemplate(guild) {
+    let disabled = this.settings.disabledServers.includes(guild.id) ? ' disabled' : '';
+    return guild.icon
+      ? `<a class="avatar-small ${disabled}" style="background-image: url(https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.webp)"></a>`
+      : `<a class="avatar-small ${disabled}">${guild.acronym}</a>`;
   }
   
   saveSettings() {
@@ -529,79 +616,154 @@ class Citador {
     this.settings = PluginUtilities.loadSettings(this.getName(), this.defaultSettings);
   }
   
-  getSettingsPanel() {
-    let panel = $("<form>").addClass("form citador").css("width", "100%");
-    if (this.initialized) this.generateSettings(panel);
-    return panel[0];
+  resetSettings(panel) {
+    this.settings = this.defaultSettings;
+    this.saveSettings();
+    panel.empty();
+    this.generateSettings(panel);
   }
   
-  getCheckbox(settings, type, panel) {
-    let values = this.local.settings.useFallbackCodeblock.choices;
-    if (settings.useFallbackCodeblock == type)
-      return $('<div class="item-2zi_5J marginBottom8-1mABJ4 horizontal-2VE-Fw flex-3B1Tl4 directionRow-yNbSvJ cardPrimaryEditable-2IQ7-V card-3DrRmC" style="border-color: rgb(114, 137, 218); background-color: rgb(114, 137, 218); padding: 10px;">' +
-            '<label class="checkboxWrapper-2Yvr_Y">' +
-              '<input type="checkbox" class="inputDefault-2tiBIA input-oWyROL" value="on">' +
-              '<div class="checkbox-1QwaS4 center-1MLNrE flex-3B1Tl4 justifyCenter-29N31w alignCenter-3VxkQP box-XhjOl4 checked-2TahvT" style="border-color: rgb(114, 137, 218);">' +
-                '<svg name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><polyline stroke="#7289da" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline></g></svg>' +
-              '</div>' +
-            '</label>' +
-            '<div class="info-1Z508c">' +
-              `<div class="titleChecked-3Ngoss title-1M-Ras" style="color: rgb(255, 255, 255);">${values[type]}</div>` +
-            '</div>' +
-          '</div>');
-    else
-      return $('<div class="item-2zi_5J marginBottom8-1mABJ4 horizontal-2VE-Fw flex-3B1Tl4 directionRow-yNbSvJ cardPrimaryEditable-2IQ7-V card-3DrRmC" style="padding: 10px;">' +
-        '<label class="checkboxWrapper-2Yvr_Y">' +
-          '<input type="checkbox" class="inputDefault-2tiBIA input-oWyROL" value="on">' +
-          '<div class="checkbox-1QwaS4 center-1MLNrE flex-3B1Tl4 justifyCenter-29N31w alignCenter-3VxkQP box-XhjOl4">' +
-            '<svg name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><polyline stroke="transparent" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline></g></svg>' +
-          '</div>' +
-        '</label>' +
-        '<div class="info-1Z508c">' +
-          `<div class="title-1M-Ras">${values[type]}</div>` +
-        '</div>' +
-      '</div>').on('click.citador', () => {
-        this.settings.useFallbackCodeblock = type;
-        this.saveSettings();
-        panel.empty();
-        this.generateSettings(panel);
-      });
-  }
+  observeContextMenus(e) {
+		if (!e.addedNodes.length || !(e.addedNodes[0] instanceof Element) || !e.addedNodes[0].classList) return;
+		let elem  = e.addedNodes[0],
+      context = elem.classList.contains('context-menu') ? elem : elem.querySelector('.context-menu');
+		if (!context) return;
+    
+		if (!ReactUtilities.getReactProperty(context, "return.memoizedProps.guild")) return;
+    
+    let {id} = ReactUtilities.getReactProperty(context, "return.memoizedProps.guild");
+		$(context).find('.item').first().after(
+      $(new PluginContextMenu.ToggleItem(this.local.settings.disableServers.context, !this.settings.disabledServers.includes(id), {
+        callback: e => {
+          if (this.settings.disabledServers.includes(id))
+            this.settings.disabledServers.splice(this.settings.disabledServers.indexOf(id), 1);
+          else
+            this.settings.disabledServers.push(id);
+        }
+      }).getElement())
+    );
+	}
   
   generateSettings(panel) {
-    let form = `<div class="ui-form-item flexChild-1KGW5q">
-            <div class="radioGroup-2P3MJo"></div>
-          </div>`;
-    new PluginSettings.ControlGroup(this.local.settings.useFallbackCodeblock.title, () => this.saveSettings(), {shown: true, collapsible: false}).appendTo(panel).append(
-      $(form).find('.radioGroup-2P3MJo').append([
-        this.getCheckbox(this.settings, 0, panel),
-        this.getCheckbox(this.settings, 1, panel),
-        this.getCheckbox(this.settings, 2, panel)
-      ])
+    const defaultForm = 
+      `<div class="citador ui-form-item flexChild-1KGW5q">
+        <h5 class="h5 h5-3KssQU"></h5>
+        <div class="description description-3MVziF formText-1L-zZB margin-bottom-8 modeDefault-389VjU primary-2giqSn"></div>
+      </div>`;
+    panel.append(
+      $(defaultForm)
+        .find('.h5')
+        .toggleClass('title-1pmpPr size12-1IGJl9 height16-1qXrGy weightSemiBold-T8sxWH defaultMarginh5-2UwwFY marginBottom8-1mABJ4')
+        .html(this.local.settings.useFallbackCodeblock.title)
+        .parent()
+        .append(
+          $('<div class="radioGroup-2P3MJo">')
+          .append(
+            this.local.settings.useFallbackCodeblock.choices.map((choice, i) =>
+              this.Checkbox(choice, this.settings.useFallbackCodeblock, i)
+            )
+          )
+        ),
+      $(defaultForm)
+        .css('padding-top', '10px')
+        .find('.h5')
+        .toggleClass('title-1pmpPr size12-1IGJl9 height16-1qXrGy weightSemiBold-T8sxWH defaultMarginh5-2UwwFY marginBottom8-1mABJ4')
+        .html(this.local.settings.disableServers.title)
+        .parent()
+        .find('.description')
+        .html(this.local.settings.disableServers.description)
+        .parent()
+        .append(
+          $('<div class="citador-guilds">').append(
+            this.guilds.map(guild => {
+              let guildEl = this.GuildElement(guild);
+              return guildEl
+                .click(() => {
+                  if (this.settings.disabledServers.includes(guild.id)) {
+                    this.settings.disabledServers.splice(this.settings.disabledServers.indexOf(guild.id), 1);
+                    guildEl.find('.avatar-small')
+                      .toggleClass('disabled');
+                  } else {
+                    this.settings.disabledServers.push(guild.id);
+                    guildEl.find('.avatar-small')
+                      .toggleClass('disabled');
+                  }
+                  this.saveSettings();
+                });
+            })
+          )
+        ),
+      $(defaultForm)
+        .css('padding-top', '10px')
+        .append(
+          $(`<button type="button">`)
+            .toggleClass('buttonRedFilledDefault-1TrZ9q buttonFilledDefault-AELjWf buttonDefault-2OLW-v button-2t3of8 buttonFilled-29g7b5 buttonRedFilled-1NjJNj mediumGrow-uovsMu')
+            .css({
+              'margin': '0 auto'
+            })
+            .html(this.local.settings.reset)
+            .click(() => this.resetSettings(panel))
+        )
     );
   }
-  getName         () { return "Citador";            }
-  getDescription  () { return this.local.description}
-  getVersion      () { return "1.6.7";              }
-  getAuthor       () { return "Nirewen";            }
-  unload          () { this.deleteEverything();     }
-  stop            () { this.deleteEverything();     }
-  load            () {                              }
-  onChannelSwitch () {
-    if (this.quoteProps) {
-      this.attachParser();
-      
-      $('.channelTextArea-1HTP3C').prepend(this.quoteMsg);
-      
-      if (!this.canChat()) {
-        $('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
-        new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noChatTooltip, 'red');
-      }
-      else if (!this.canEmbed() && this.settings.useFallbackCodeblock == 0) {
-        $('.quote-msg').find('.citar-btn.hidden:not(.cant-embed)').toggleClass('hidden cant-embed');
-        new PluginTooltip.Tooltip($('.quote-msg').find('.citar-btn'), this.local.noPermTooltip, 'red');
-      } else
-        $('.quote-msg').find('.citar-btn:not(.hidden).cant-embed').toggleClass('hidden cant-embed');
+  
+  Checkbox(value, setting, type) {
+    let checkbox = $(`<div class="item-2zi_5J marginBottom8-1mABJ4 horizontal-2VE-Fw flex-3B1Tl4 directionRow-yNbSvJ cardPrimaryEditable-2IQ7-V card-3DrRmC" style="padding: 10px;">
+      <label class="checkboxWrapper-2Yvr_Y">
+        <input type="checkbox" class="inputDefault-2tiBIA input-oWyROL" value="on">
+        <div class="checkbox-1QwaS4 center-1MLNrE flex-3B1Tl4 justifyCenter-29N31w alignCenter-3VxkQP box-XhjOl4">
+          <svg name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" fill-rule="evenodd">
+              <polyline stroke="transparent" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline>
+            </g>
+          </svg>
+        </div>
+      </label>
+      <div class="info-1Z508c">
+        <div class="title-1M-Ras">${value}</div>
+      </div>
+    </div>`);
+    if (setting == type) {
+      checkbox
+        .css({
+          'border-color': 'rgb(114, 137, 218)',
+          'background-color': 'rgb(114, 137, 218)'
+        })
+        .find('.checkbox-1QwaS4')
+        .toggleClass('checked-2TahvT')
+        .css('border-color', 'rgb(114, 137, 218)')
+      checkbox
+        .find('polyline')
+        .attr('stroke', '#7289da')
+      checkbox
+        .find('.title-1M-Ras')
+        .toggleClass('titleChecked-3Ngoss')
+        .css('color', 'rgb(255, 255, 255)');
+      return checkbox;
+    } else {
+      return checkbox
+        .on('click.citador', () => {
+          this.settings.useFallbackCodeblock = type;
+          this.saveSettings();
+          checkbox.parent().empty().append(
+            this.local.settings.useFallbackCodeblock.choices.map((choice, i) => 
+              this.Checkbox(choice, this.settings.useFallbackCodeblock, i)
+            )
+          );
+        });
     }
+  }
+  
+  GuildElement(guild) {
+    const guildEl = $(
+    `<div class="guild">
+       <div>
+         <div class="guild-inner">
+           ${this.getIconTemplate(guild)}
+         </div>
+       </div>
+     </div>`);
+    new PluginTooltip.Tooltip(guildEl.find('.avatar-small'), guild.name);
+    return guildEl;
   }
 }
