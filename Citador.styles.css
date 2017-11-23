@@ -59,7 +59,6 @@
 }
 .citador-guilds .guild {
   display: inline-block;
-  pointer-events: none;
 }
 .citador-guilds .avatar-small {
   transition: filter 10ms ease-in-out;
@@ -72,6 +71,8 @@
   display: block;
   background-color: #2f3136;
   user-select: none;
+  cursor: pointer;
+  ponter-events: none;
 }
 .citador-guilds .avatar-small.disabled {
   filter: grayscale(1) brightness(0.6);
