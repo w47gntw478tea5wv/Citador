@@ -119,40 +119,6 @@ class Citador {
     };
   }
   
-  /** MAIN **/
-  
-  constructor() {
-    this.quoteURL = 'https://github.com/nirewen/Citador?';
-    this.CDN_URL = 'https://cdn.discordapp.com/avatars/';
-    this.ASSETS_URL = 'https://discordapp.com';
-    this.log = (message, method = 'log') => console[method](`[${this.getName()}]`, message);
-    this.inject = (name, options) => {
-      let element = document.getElementById(options.id);
-      if (element) element.parentElement.removeChild(element);
-      element = document.createElement(name);
-      for (let attr in options)
-        element.setAttribute(attr, options[attr]);
-      document.head.appendChild(element);
-      return element;
-    };
-    this.remove = (element) => {
-      let elem = document.getElementById(element);
-      if (elem)
-        elem.parentElement.removeChild(elem);
-    };
-    this.contextObserver = new MutationObserver((changes) => {
-      for (let change in changes) 
-        this.observeContextMenus(changes[change]);
-    });
-  }
-  
-  get defaultSettings() {
-    return {
-      useFallbackCodeblock: 0,
-      disabledServers: []
-    }
-  }
-  
   /** BD FUNCTIONS **/
   
   getName         () { return "Citador";            }
@@ -172,7 +138,7 @@ class Citador {
       type: 'text/css',
       id: 'citador-css',
       rel: 'stylesheet',
-      href: 'https://rawgit.com/nirewen/Citador/master/Citador.styles.css'
+      href: 'https://rawgit.com/nirewen/Citador/quote-btn/Citador.styles.css'
     });
 
     if (typeof window.ZeresLibrary !== "undefined") 
@@ -194,6 +160,13 @@ class Citador {
     this.HistoryUtils      = PluginUtilities.WebpackModules.findByUniqueProperties(['transitionTo', 'replaceWith', 'getHistory']);
     this.moment            = PluginUtilities.WebpackModules.findByUniqueProperties(['parseZone']);
     this.initialized       = true;
+    this.quoteURL          = 'https://github.com/nirewen/Citador?';
+    this.CDN_URL           = 'https://cdn.discordapp.com/avatars/';
+    this.ASSETS_URL        = 'https://discordapp.com';
+    this.contextObserver   = new MutationObserver((changes) => {
+      for (let change in changes) 
+        this.observeContextMenus(changes[change]);
+    });
     this.contextObserver.observe(document.querySelector('.app'), {childList: true, subtree: true});
     this.loadSettings();
   
@@ -211,7 +184,7 @@ class Citador {
                 
               new PluginTooltip.Tooltip($(this).find('.citar-btn'), self.local.quoteTooltip);
               $(this).find('.citar-btn')
-                .on('mousedown.citador', function() {return false})
+                .on('mousedown.citador', () => false)
                 .click(function() {
                   self.attachParser();
                   
@@ -254,9 +227,7 @@ class Citador {
                     $('.quote-msg').find('.edited, .btn-option, .btn-reaction').remove();
                     
                     $('.quote-msg .message-group').append('<div class="quote-close"></div>');
-                    $('.quote-msg').find('.quote-close').click(function() {
-                      self.cancelQuote();
-                    });
+                    $('.quote-msg').find('.quote-close').click(self.cancelQuote);
                     
                     // define a função de clique, pra deletar uma mensagem que você não deseja citar
                     $('.quote-msg').find('.delete-msg-btn')
@@ -398,9 +369,7 @@ class Citador {
           msgG      = guilds.filter(g => g.id == msgC.guild_id)[0],
           
           author    = msg.author,
-          avatarURL = author.getAvatarURL().startsWith(this.CDN_URL) 
-                        ? author.getAvatarURL() 
-                        : this.ASSETS_URL + author.getAvatarURL(),
+          avatarURL = author.getAvatarURL(),
           color     = parseInt(msg.colorString ? msg.colorString.slice(1) : 'ffffff', 16),
           msgCnt    = this.MessageParser.parse(cc, $('.channelTextArea-1HTP3C textarea').val()),
           text      = messages.map(m => m.content).join('\n'),
@@ -426,7 +395,7 @@ class Citador {
       let embed = {
           author: {
             name: msg.nick || author.username,
-            icon_url: avatarURL.startsWith("https://") ? avatarURL : `https://discordapp.com/${avatarURL}`
+            icon_url: avatarURL.startsWith(this.CDN_URL) ? avatarURL : `${this.ASSETS_URL}${avatarURL}`
           },
           url: `${this.quoteURL}${msgG ? `guild_id=${msgG.id}&` : ''}channel_id=${msgC.id}&message_id=${msg.id}`,
           description: text,
@@ -578,6 +547,29 @@ class Citador {
     this.selectionP = null;
   }
   
+  observeContextMenus(e) {
+    if (!e.addedNodes.length || !(e.addedNodes[0] instanceof Element) || !e.addedNodes[0].classList) return;
+    let elem  = e.addedNodes[0],
+      context = elem.classList.contains('context-menu') ? elem : elem.querySelector('.context-menu');
+    if (!context) return;
+    
+    let props = ReactUtilities.getReactProperty(context, "return.memoizedProps.guild");
+    
+    if (!props) return;
+    
+    let {id} = props;
+    $(context).find('.item').first().after(
+      $(new PluginContextMenu.ToggleItem(this.local.settings.disableServers.context, !this.settings.disabledServers.includes(id), {
+        callback: e => {
+          if (this.settings.disabledServers.includes(id))
+            this.settings.disabledServers.splice(this.settings.disabledServers.indexOf(id), 1);
+          else
+            this.settings.disabledServers.push(id);
+        }
+      }).getElement())
+    );
+  }
+  
   /** UTILS **/
   
   canEmbed() {
@@ -588,6 +580,26 @@ class Citador {
   canChat() {
     const channel = ReactUtilities.getOwnerInstance($(".messages-wrapper")[0]);
     return channel.props.channel.isPrivate() || channel.can(0x800, {channelId: channel.props.channel.id});
+  }
+  
+  log(message, method = 'log') {
+    console[method](`[${this.getName()}]`, message)
+  }
+  
+  inject(name, options) {
+    let element = document.getElementById(options.id);
+    if (element) element.parentElement.removeChild(element);
+    element = document.createElement(name);
+    for (let attr in options)
+      element.setAttribute(attr, options[attr]);
+    document.head.appendChild(element);
+    return element;
+  }
+  
+  remove(element) {
+    let elem = document.getElementById(element);
+    if (elem)
+      elem.parentElement.removeChild(elem);
   }
   
   deleteEverything() {
@@ -602,6 +614,13 @@ class Citador {
   
   get guilds () { 
     return ReactUtilities.getOwnerInstance($(".guilds-wrapper")[0]).state.guilds.map(o => o.guild);
+  }
+  
+  get defaultSettings() {
+    return {
+      useFallbackCodeblock: 0,
+      disabledServers: []
+    }
   }
   
   getIconTemplate(guild) {
@@ -624,29 +643,6 @@ class Citador {
     this.saveSettings();
     panel.empty();
     this.generateSettings(panel);
-  }
-  
-  observeContextMenus(e) {
-    if (!e.addedNodes.length || !(e.addedNodes[0] instanceof Element) || !e.addedNodes[0].classList) return;
-    let elem  = e.addedNodes[0],
-      context = elem.classList.contains('context-menu') ? elem : elem.querySelector('.context-menu');
-    if (!context) return;
-    
-    let props = ReactUtilities.getReactProperty(context, "return.memoizedProps.guild");
-    
-    if (!props) return;
-    
-    let {id} = props;
-    $(context).find('.item').first().after(
-      $(new PluginContextMenu.ToggleItem(this.local.settings.disableServers.context, !this.settings.disabledServers.includes(id), {
-        callback: e => {
-          if (this.settings.disabledServers.includes(id))
-            this.settings.disabledServers.splice(this.settings.disabledServers.indexOf(id), 1);
-          else
-            this.settings.disabledServers.push(id);
-        }
-      }).getElement())
-    );
   }
   
   generateSettings(panel) {
