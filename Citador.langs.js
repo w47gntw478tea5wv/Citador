@@ -1,5 +1,4 @@
-window.Citador = {
-  languages: {
+const languages = {
     pt: {
       description: "Cita alguém no chat",
       startMsg: "Iniciado",
@@ -107,3 +106,5 @@ window.Citador = {
     }
   }
 }
+
+window.CitadorLanguages = languages;
