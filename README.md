@@ -1,37 +1,40 @@
 # Citador
-Um plugin pra facilitar a citação no chat, assim, nem você nem ninguém se perde no assunto :wink:
+A plugin to facilitate quoting for a better conversation, without people being lost in the context :wink:
 
-## Recursos
-- Permite ver a mensagem que será citada
-- Permite deletar uma mensagem que não deseja citar
-- Permite que você selecione uma mensagem que deseja citar
-- Permite que você mude de servidor ou canal enquanto está citando
+## Features
+- Allows you to see the message that will be quoted
+- Allows you to delete a message you don't want to quote
+- Allows you to select the message you want to quote
+- Allows you to switch servers or channels while quoting
 
-### Instalação do BetterDiscord
+### BetterDiscord installation
 
-1. Vá até o [site do BetterDiscord](http://betterdiscord.net)
-2. Baixe a versão do seu sistema
-3. Extraia os arquivos do zip
-4. Instale, clicando no arquivo .exe
+1. Go to the [BetterDiscord site](http://betterdiscord.net)
+2. Download the version for your operating system
+3. Extract the files from the .zip
+4. Install by clicking on the .exe file
 
-### Instalação do plugin
+### Plugin installation
 
-Para instalar, siga os passos da instalação de um plugin comum:
+In order to install, follow the steps of a regular plugin installation:
 
-1. Baixe a última versão em [releases](https://github.com/nirewen/Citador/releases).
-2. Faça <kbd>Win</kbd> + <kbd>R</kbd> (ou abra o Executar pelo menu iniciar)
-3. Digite `%appdata%/BetterDiscord/plugins` e dê <kbd>Enter</kbd>
-4. Coloque o arquivo baixado nessa pasta.
+1. Download the latest version in [releases](https://github.com/nirewen/Citador/releases).
+2. Type <kbd>Win</kbd> + <kbd>R</kbd> (or open 'Run' in start menu)
+3. Type `%appdata%/BetterDiscord/plugins` and hit `Enter`
+4. Place the downloaded file there.
 
-Qualquer dúvida, me chame no Discord: Nirewen`#9011`
+Any question, ask me on Discord: Nirewen`#9011`
 
-Você também pode entrar no [servidor de suporte ao plugin](https://discord.gg/ubzHX8B) [PT]
+You can also join [the support server](https://discord.gg/tQrdqKG) [EN]
 
-### Bugs conhecidos
-- [ ] Emotes globals / emotes de servidores poderão não aparecer
-- Pra esse aqui eu não vou consertar, uma vez que Nitros não têm esse problema
-- Só não fique surpreso, a culpa não é do plugin em si, mas da API do Discord, 
-  que impediu emotes globais em embeds (que é basicamente o que as quotes são)
+
+Translated by L11K`#5987`
+
+### Known bugs
+- [ ] Global emotes / Guild emotes might not show
+- For this one I won't fix, once Nitros don't have this issue
+- Just don't be surprised if the emote doesn't work, it's not plugin's fault, but Discord's API
+  that prohibited global emotes in embeds (what quotes basically are)
 
 ### Preview
 ![Citador em ação](http://nirewen.s-ul.eu/02Tcv6ZT.gif)

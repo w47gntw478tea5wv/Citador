@@ -1,7 +1,7 @@
 //META{"name":"Citador"}*//
 
 class Citador {
-  
+
   /** LOCALE **/
   
   get local() {
