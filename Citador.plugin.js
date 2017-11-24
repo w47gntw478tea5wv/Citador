@@ -61,15 +61,15 @@ class Citador {
           attachment: "Вложение",
           settings: {
             useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
+              title: "Форматировать цитаты блоками кода",
+              choices: ["Никогда", "Всегда", "Только если нет нужных прав"]
             },
             disableServers: {
-              title: "Disable embed quotes for specific servers",
-              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
-              context: "Embed quotes"
+              title: "Отключить встраивание цитат для отдельных серверов",
+              description: "Нажмите на иконку сервера, чтобы отключить встраивание. Нажмите снова, чтобы включить.</br>Вы так же можете нажать ПКМ по иконке, чтобы изменить настройки оттуда.",
+              context: "Встраивание цитат"
             },
-            reset: 'Reset settings'
+            reset: 'Сбросить настройки'
           }
         };
       case 'ja': 
