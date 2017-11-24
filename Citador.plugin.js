@@ -163,11 +163,6 @@ class Citador {
     this.quoteURL          = 'https://github.com/nirewen/Citador?';
     this.CDN_URL           = 'https://cdn.discordapp.com/avatars/';
     this.ASSETS_URL        = 'https://discordapp.com';
-    this.contextObserver   = new MutationObserver((changes) => {
-      for (let change in changes) 
-        this.observeContextMenus(changes[change]);
-    });
-    this.contextObserver.observe(document.querySelector('.app'), {childList: true, subtree: true});
     this.loadSettings();
   
     this.patchExternalLinks();
@@ -547,7 +542,7 @@ class Citador {
     this.selectionP = null;
   }
   
-  observeContextMenus(e) {
+  observer(e) {
     if (!e.addedNodes.length || !(e.addedNodes[0] instanceof Element) || !e.addedNodes[0].classList) return;
     let elem  = e.addedNodes[0],
       context = elem.classList.contains('context-menu') ? elem : elem.querySelector('.context-menu');
@@ -608,7 +603,6 @@ class Citador {
     $('.messages .message-group').off('mouseleave');
     this.remove("citador-css");
     this.switchObserver.disconnect();
-    this.contextObserver.disconnect();
     this.initialized = false;
   }
   
