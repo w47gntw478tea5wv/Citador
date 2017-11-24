@@ -222,7 +222,7 @@ class Citador {
                     $('.quote-msg').find('.edited, .btn-option, .btn-reaction').remove();
                     
                     $('.quote-msg .message-group').append('<div class="quote-close"></div>');
-                    $('.quote-msg').find('.quote-close').click(self.cancelQuote);
+                    $('.quote-msg').find('.quote-close').click(() => self.cancelQuote());
                     
                     // define a função de clique, pra deletar uma mensagem que você não deseja citar
                     $('.quote-msg').find('.delete-msg-btn')
