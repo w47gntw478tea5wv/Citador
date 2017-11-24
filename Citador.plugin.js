@@ -560,6 +560,7 @@ class Citador {
             this.settings.disabledServers.splice(this.settings.disabledServers.indexOf(id), 1);
           else
             this.settings.disabledServers.push(id);
+          this.saveSettings();
         }
       }).getElement())
     );
