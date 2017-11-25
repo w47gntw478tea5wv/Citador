@@ -35,19 +35,19 @@ class Citador {
           quoteTooltip: "Zitieren",
           deleteTooltip: "Löschen",
           noPermTooltip: "Keine Rechte, zu zitieren",
-          noChatTooltip: "No permission to send messages",
+          noChatTooltip: "Keine Rechte, zu senden",
           attachment: "Anhang",
           settings: {
             useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
+              title: "Codeblock-Zitierformat benutzen",
+              choices: ["Nie", "Immer", "Nur wenn keine Rechte"]
             },
             disableServers: {
-              title: "Disable embed quotes for specific servers",
-              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
-              context: "Embed quotes"
+              title: "Eingebettete Zitate für bestimme Server deaktivieren",
+              description: "Klicke auf einen Server, um eingebettete Zitate auf diesen zu deaktivieren. Klicke nochmal zum Aktivieren.</br>Du kannst einen Server zum automatischen Umstellen auch rechtsklicken.",
+              context: "Eingebettete Zitate"
             },
-            reset: 'Reset settings'
+            reset: 'Einstellungen zurücksetzen'
           }
         };
       case 'ru': 
