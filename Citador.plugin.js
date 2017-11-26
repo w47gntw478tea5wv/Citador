@@ -6,6 +6,28 @@ class Citador {
   
   get local() {
     switch (document.documentElement.getAttribute('lang').split('-')[0]) {
+      case 'sv':
+        return {
+          description: "Citerar någon i chatten",
+          startMsg: "Startad",
+          quoteTooltip: "Citera",
+          deleteTooltip: "Radera",
+          noPermTooltip: "Saknar behörigheter för att citera",
+          noChatTooltip: "Saknar behörigheter för att skicka meddelanden",
+          attachment: "Bilaga",
+          settings: {
+            useFallbackCodeblock: {
+              title: "Använd format för kodblocks citation",
+              choices: ["Aldrig", "Alltid", "Bara när behörighet saknas"]
+            },
+            disableServers: {
+              title: "Inaktivera inbädda citat för specifika servrar",
+              description: "Klicka på en server för att inaktivera inbädda citat för den. Klicka igen för att aktivera.</br> Du kan också högerklicka på en guild för att växla om det.",
+              context: "Inbädda citat"
+            },
+            reset: 'Återställ inställningar'
+          }
+        };
       case 'pt':
         return {
           description: "Cita alguém no chat",
