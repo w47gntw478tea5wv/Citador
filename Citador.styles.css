@@ -1,8 +1,7 @@
 .citar-btn {
 	cursor: pointer;
-	margin: 0 5px;
-	font-size: 1vh;
-	padding: 3px 10px;
+	margin: 3px 5px;
+	padding: 0 10px;
 	background-color: rgb(10, 10, 10);
 	border-radius: 3px;
 	transition: all 200ms ease-in-out;
