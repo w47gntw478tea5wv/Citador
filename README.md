@@ -9,7 +9,7 @@ A plugin to facilitate quoting for a better conversation, without people being l
 
 ### BetterDiscord installation
 
-1. Go to the [BetterDiscord site](http://betterdiscord.net)
+1. Go to the [BetterDiscord site](https://github.com/rauenzi/BetterDiscordApp/releases/tag/0.2.82)
 2. Download the version for your operating system
 3. Extract the files from the .zip
 4. Install by clicking on the .exe file

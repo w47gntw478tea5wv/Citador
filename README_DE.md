@@ -12,7 +12,7 @@ Ein Plugin um einfacher auf Discord zu zitieren, ohne dass Leute den Faden verli
 
 ### BetterDiscord Installation
 
-1. Gehe auf die [BetterDiscord Webseite](http://betterdiscord.net)
+1. Gehe auf die [BetterDiscord Webseite](https://github.com/rauenzi/BetterDiscordApp/releases/tag/0.2.82)
 2. Lade die Version für dein Betriebssystem herunter
 3. Entpacke die Dateien aus der `.zip` Datei
 4. Installiere BetterDiscord durch Klicken der `.exe` Datei

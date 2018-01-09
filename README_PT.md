@@ -9,7 +9,7 @@ Um plugin pra facilitar a citação no chat, assim, nem você nem ninguém se pe
 
 ### Instalação do BetterDiscord
 
-1. Vá até o [site do BetterDiscord](http://betterdiscord.net)
+1. Vá até o [site de downlaod do BetterDiscord](https://github.com/rauenzi/BetterDiscordApp/releases/tag/0.2.82)
 2. Baixe a versão do seu sistema
 3. Extraia os arquivos do zip
 4. Instale, clicando no arquivo .exe
