@@ -6,28 +6,6 @@ class Citador {
   
   get local() {
     switch (document.documentElement.getAttribute('lang').split('-')[0]) {
-      case 'sv':
-        return {
-          description: "Citerar någon i chatten",
-          startMsg: "Startad",
-          quoteTooltip: "Citera",
-          deleteTooltip: "Radera",
-          noPermTooltip: "Saknar behörigheter för att citera",
-          noChatTooltip: "Saknar behörigheter för att skicka meddelanden",
-          attachment: "Bilaga",
-          settings: {
-            useFallbackCodeblock: {
-              title: "Använd format för kodblocks citation",
-              choices: ["Aldrig", "Alltid", "Bara när behörighet saknas"]
-            },
-            disableServers: {
-              title: "Inaktivera inbädda citat för specifika servrar",
-              description: "Klicka på en server för att inaktivera inbädda citat för den. Klicka igen för att aktivera.</br> Du kan också högerklicka på en guild för att växla om det.",
-              context: "Inbädda citat"
-            },
-            reset: 'Återställ inställningar'
-          }
-        };
       case 'pt':
         return {
           description: "Cita alguém no chat",
@@ -57,19 +35,19 @@ class Citador {
           quoteTooltip: "Zitieren",
           deleteTooltip: "Löschen",
           noPermTooltip: "Keine Rechte, zu zitieren",
-          noChatTooltip: "Keine Rechte, zu senden",
+          noChatTooltip: "No permission to send messages",
           attachment: "Anhang",
           settings: {
             useFallbackCodeblock: {
-              title: "Codeblock-Zitierformat benutzen",
-              choices: ["Nie", "Immer", "Nur wenn keine Rechte"]
+              title: "Use codeblock quote format",
+              choices: ["Never", "Always", "Only when without permission"]
             },
             disableServers: {
-              title: "Eingebettete Zitate für bestimme Server deaktivieren",
-              description: "Klicke auf einen Server, um eingebettete Zitate auf diesen zu deaktivieren. Klicke nochmal zum Aktivieren.</br>Du kannst einen Server zum automatischen Umstellen auch rechtsklicken.",
-              context: "Eingebettete Zitate"
+              title: "Disable embed quotes for specific servers",
+              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
+              context: "Embed quotes"
             },
-            reset: 'Einstellungen zurücksetzen'
+            reset: 'Reset settings'
           }
         };
       case 'ru': 
@@ -145,7 +123,7 @@ class Citador {
   
   getName         () { return "Citador";            }
   getDescription  () { return this.local.description}
-  getVersion      () { return "1.7.0";              }
+  getVersion      () { return "1.7.1";              }
   getAuthor       () { return "Nirewen";            }
   unload          () { this.deleteEverything();     }
   stop            () { this.deleteEverything();     }
@@ -160,7 +138,7 @@ class Citador {
       type: 'text/css',
       id: 'citador-css',
       rel: 'stylesheet',
-      href: 'https://rawgit.com/nirewen/Citador/master/Citador.styles.css'
+      href: 'https://cdn.rawgit.com/nirewen/Citador/master/Citador.styles.css'
     });
 
     if (typeof window.ZeresLibrary !== "undefined") 
@@ -174,13 +152,13 @@ class Citador {
     PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/master/Citador.plugin.js");
     PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
     this.switchObserver    = PluginUtilities.createSwitchObserver(this);
-    this.MessageParser     = PluginUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
-    this.MessageQueue      = PluginUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
-    this.MessageController = PluginUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
-    this.EventDispatcher   = PluginUtilities.WebpackModules.findByUniqueProperties(["dispatch"]);
-    this.MainDiscord       = PluginUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
-    this.HistoryUtils      = PluginUtilities.WebpackModules.findByUniqueProperties(['transitionTo', 'replaceWith', 'getHistory']);
-    this.moment            = PluginUtilities.WebpackModules.findByUniqueProperties(['parseZone']);
+    this.MessageParser     = InternalUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
+    this.MessageQueue      = InternalUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
+    this.MessageController = InternalUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
+    this.EventDispatcher   = InternalUtilities.WebpackModules.findByUniqueProperties(["dispatch"]);
+    this.MainDiscord       = InternalUtilities.WebpackModules.findByUniqueProperties(["ActionTypes"]);
+    this.HistoryUtils      = InternalUtilities.WebpackModules.findByUniqueProperties(['transitionTo', 'replaceWith', 'getHistory']);
+    this.moment            = InternalUtilities.WebpackModules.findByUniqueProperties(['parseZone']);
     this.initialized       = true;
     this.quoteURL          = 'https://github.com/nirewen/Citador?';
     this.CDN_URL           = 'https://cdn.discordapp.com/avatars/';
@@ -412,15 +390,15 @@ class Citador {
       let embed = {
           author: {
             name: msg.nick || author.username,
-            icon_url: avatarURL.startsWith(this.CDN_URL) ? avatarURL : `${this.ASSETS_URL}${avatarURL}`
+            icon_url: avatarURL.startsWith(this.CDN_URL) ? avatarURL : `${this.ASSETS_URL}${avatarURL}`,
+            url: `${this.quoteURL}${msgG ? `guild_id=${msgG.id}&` : ''}channel_id=${msgC.id}&message_id=${msg.id}`,
           },
-          url: `${this.quoteURL}${msgG ? `guild_id=${msgG.id}&` : ''}channel_id=${msgC.id}&message_id=${msg.id}`,
           description: text,
           footer: {
             text: `in ${chName}${atServer}`
           },
           color,
-          timestamp: msg.timestamp.toISOString()
+          timestamp: msg.timestamp.toISOString(),
         },
         attachments = messages.map(m => m.attachments).reduce((a, b) => a.concat(b));
             
@@ -525,22 +503,22 @@ class Citador {
   }
   
   patchExternalLinks() {
-    const self = this,
-      ExternalLink = PluginUtilities.WebpackModules.find(a => a.prototype && a.prototype.onClick).prototype;
-    ExternalLink.oldOnClick = ExternalLink.onClick;
-    ExternalLink.onClick = function(e) {
-      const t = this.props;
-      if (t.href.startsWith(self.quoteURL)) {
-        e.preventDefault();
-        const querystring = require('querystring');
-        const {guild_id, channel_id, message_id} = querystring.parse(t.href.substring(self.quoteURL.length));
-        if (!guild_id || self.guilds.find(g => g.id == guild_id))
-          self.HistoryUtils.transitionTo(self.MainDiscord.Routes.MESSAGE(guild_id, channel_id, message_id));
-        else
-          ReactUtilities.getOwnerInstance($('.app')[0]).shake();
-      } else 
-        this.oldOnClick(e);
-    }
+    let LinkComponent = InternalUtilities.WebpackModules.find(InternalUtilities.Filters.byCode(/trusted/))
+    this.cancel = InternalUtilities.monkeyPatch(LinkComponent.prototype, "render", {before: (data) => {
+        self = data.thisObject;
+        if (self.props.href.startsWith(this.quoteURL)) {
+            self.props.trusted = true;
+            self.props.onClick = (e) => {
+                e.preventDefault();
+                const querystring = require('querystring');
+                const {guild_id, channel_id, message_id} = querystring.parse(self.props.href.substring(this.quoteURL.length));
+                if (!guild_id || this.guilds.find(g => g.id == guild_id))
+                  this.HistoryUtils.transitionTo(this.MainDiscord.Routes.MESSAGE(guild_id, channel_id, message_id));
+                else
+                  ReactUtilities.getOwnerInstance($('.app')[0]).shake();
+            }
+        }
+    }});
   }
   
   removeQuoteAtIndex(i) {
@@ -627,6 +605,7 @@ class Citador {
     this.remove("citador-css");
     this.switchObserver.disconnect();
     this.initialized = false;
+    this.cancel();
   }
   
   get guilds () { 
