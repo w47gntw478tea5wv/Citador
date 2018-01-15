@@ -30,24 +30,24 @@ class Citador {
         };
       case 'de': 
         return {
-          description: "Zitiert jemanden im Chat",
+          description: "Zitiert jemanden im Chat mithilfe von eingebetten Nachrichten",
           startMsg: "Gestartet",
           quoteTooltip: "Zitieren",
           deleteTooltip: "Löschen",
-          noPermTooltip: "Keine Rechte, zu zitieren",
-          noChatTooltip: "No permission to send messages",
+          noPermTooltip: "Keine Rechte zum Zitieren",
+          noChatTooltip: "Keine Rechte Nachrichten zu senden",
           attachment: "Anhang",
           settings: {
             useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
+              title: "Im Code-Format senden",
+              choices: ["Niemals", "Immer", "Nur, falls keine Berechtigung"]
             },
             disableServers: {
-              title: "Disable embed quotes for specific servers",
-              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
-              context: "Embed quotes"
+              title: "Deactiviere Zitate für spezielle Server",
+              description: "Klicke auf einen Server um Zitate zu deaktivieren. Klicke erneut zum Aktivieren.</br>Du kannst auch auf einen Server rechtsklicken zum Umschalten.",
+              context: "Zitate einbetten"
             },
-            reset: 'Reset settings'
+            reset: 'Einstellungen zurücksetzten'
           }
         };
       case 'ru': 
