@@ -16,6 +16,10 @@ class Citador {
           noChatTooltip: "Sem permissão para enviar mensagens",
           attachment: "Anexo",
           settings: {
+            mentionUser: {
+              title: 'Mencionar o usuário citado',
+              description: 'Mencionar ou não o usuário que se está citando. Você pode clicar no avatar dele no preview para adicionar a menção à mensagem.'
+            },
             useFallbackCodeblock: {
               title: "Usar citação em formato de bloco de código",
               choices: ["Nunca", "Sempre", "Somente quando sem permissão"]
@@ -38,6 +42,10 @@ class Citador {
           noChatTooltip: "Keine Rechte Nachrichten zu senden",
           attachment: "Anhang",
           settings: {
+            mentionUser: {
+              title: 'Mention the quoted user',
+              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+            },
             useFallbackCodeblock: {
               title: "Im Code-Format senden",
               choices: ["Niemals", "Immer", "Nur, falls keine Berechtigung"]
@@ -60,6 +68,10 @@ class Citador {
           noChatTooltip: "No permission to send messages",
           attachment: "Вложение",
           settings: {
+            mentionUser: {
+              title: 'Mention the quoted user',
+              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+            },
             useFallbackCodeblock: {
               title: "Форматировать цитаты блоками кода",
               choices: ["Никогда", "Всегда", "Только если нет нужных прав"]
@@ -82,6 +94,10 @@ class Citador {
           noChatTooltip: "No permission to send messages",
           attachment: "添付ファイル",
           settings: {
+            mentionUser: {
+              title: 'Mention the quoted user',
+              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+            },
             useFallbackCodeblock: {
               title: "Use codeblock quote format",
               choices: ["Never", "Always", "Only when without permission"]
@@ -104,6 +120,10 @@ class Citador {
           noChatTooltip: "No permission to send messages",
           attachment: "Attachment",
           settings: {
+            mentionUser: {
+              title: 'Mention the quoted user',
+              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+            },
             useFallbackCodeblock: {
               title: "Use codeblock quote format",
               choices: ["Never", "Always", "Only when without permission"]
@@ -123,7 +143,7 @@ class Citador {
   
   getName         () { return "Citador";            }
   getDescription  () { return this.local.description}
-  getVersion      () { return "1.7.1";              }
+  getVersion      () { return "1.7.2";              }
   getAuthor       () { return "Nirewen";            }
   unload          () { this.deleteEverything();     }
   stop            () { this.deleteEverything();     }
@@ -151,7 +171,6 @@ class Citador {
     let self = this;
     PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/master/Citador.plugin.js");
     PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
-    this.switchObserver    = PluginUtilities.createSwitchObserver(this);
     this.MessageParser     = InternalUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
     this.MessageQueue      = InternalUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
     this.MessageController = InternalUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
@@ -232,6 +251,13 @@ class Citador {
                       .each(function() {
                         new PluginTooltip.Tooltip($(this), self.local.deleteTooltip);
                       });
+                      
+                    $('.quote-msg').find('.avatar-large')
+                      .click(function () {self.attachMention(self.quoteProps.messages[0].author)});
+                    
+                    if (self.settings.mentionUser) {
+                      self.attachMention(self.quoteProps.messages[0].author);
+                    }
 
                     if (range) {
                       var startPost = $(range.startContainer).closest('.message'),
@@ -303,7 +329,7 @@ class Citador {
     this.log(this.local.startMsg, "info");
   }
   
-  onChannelSwitch () {
+  onSwitch () {
     if (this.quoteProps) {
       this.attachParser();
       
@@ -349,6 +375,13 @@ class Citador {
     el[0].addEventListener("keyup", (e) => {
       if (e.keyCode == 27 && this.quoteProps) this.cancelQuote();
     }, false);
+  }
+  
+  attachMention(user) {
+    if (!$('form')[0]) return;
+    ReactUtilities.getOwnerInstance($('form')[0]).setState({
+      textValue: ReactUtilities.getOwnerInstance($('form')[0]).state.textValue + `@${user.username}#${user.discriminator}`
+    });
   }
   
   sendEmbedQuote(e) {
@@ -503,20 +536,19 @@ class Citador {
   }
   
   patchExternalLinks() {
-    let LinkComponent = InternalUtilities.WebpackModules.find(InternalUtilities.Filters.byCode(/trusted/))
-    this.cancel = InternalUtilities.monkeyPatch(LinkComponent.prototype, "render", {before: (data) => {
-        self = data.thisObject;
-        if (self.props.href.startsWith(this.quoteURL)) {
-            self.props.trusted = true;
-            self.props.onClick = (e) => {
+    let LinkComponent = InternalUtilities.WebpackModules.find(InternalUtilities.Filters.byCode(/trusted/));
+    this.cancel = InternalUtilities.monkeyPatch(LinkComponent.prototype, "render", {before: ({thisObject}) => {
+        if (thisObject.props.href.startsWith(this.quoteURL)) {
+          thisObject.props.trusted = true;
+            thisObject.props.onClick = (e) => {
                 e.preventDefault();
                 const querystring = require('querystring');
-                const {guild_id, channel_id, message_id} = querystring.parse(self.props.href.substring(this.quoteURL.length));
+                const {guild_id, channel_id, message_id} = querystring.parse(thisObject.props.href.substring(this.quoteURL.length));
                 if (!guild_id || this.guilds.find(g => g.id == guild_id))
                   this.HistoryUtils.transitionTo(this.MainDiscord.Routes.MESSAGE(guild_id, channel_id, message_id));
                 else
                   ReactUtilities.getOwnerInstance($('.app')[0]).shake();
-            }
+            };
         }
     }});
   }
@@ -603,7 +635,6 @@ class Citador {
     $('.messages .message-group').off('mouseover');
     $('.messages .message-group').off('mouseleave');
     this.remove("citador-css");
-    this.switchObserver.disconnect();
     this.initialized = false;
     this.cancel();
   }
@@ -615,6 +646,7 @@ class Citador {
   get defaultSettings() {
     return {
       useFallbackCodeblock: 0,
+      mentionUser: false,
       disabledServers: []
     }
   }
@@ -648,6 +680,22 @@ class Citador {
         <div class="description description-3MVziF formText-1L-zZB margin-bottom-8 modeDefault-389VjU primary-2giqSn"></div>
       </div>`;
     panel.append(
+      $(defaultForm)
+        .css('padding-top', '10px')
+        .find('.h5')
+        .toggleClass('title-1pmpPr size12-1IGJl9 height16-1qXrGy weightSemiBold-T8sxWH defaultMarginh5-2UwwFY marginBottom8-1mABJ4')
+        .html(this.local.settings.mentionUser.title)
+        .parent()
+        .find('.description')
+        .html(this.local.settings.mentionUser.description)
+        .toggleClass('ui-flex flex-horizontal flex-justify-start flex-align-stretch flex-nowrap')
+        .append(
+          new PluginSettings.Checkbox(this.local.settings.mentionUser.title, this.local.settings.mentionUser.description, this.settings.mentionUser, value => {
+            this.settings.mentionUser = value;
+            this.saveSettings();
+          }).getElement().find('.input-wrapper')
+        )
+        .parent(),
       $(defaultForm)
         .find('.h5')
         .toggleClass('title-1pmpPr size12-1IGJl9 height16-1qXrGy weightSemiBold-T8sxWH defaultMarginh5-2UwwFY marginBottom8-1mABJ4')
