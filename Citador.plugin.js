@@ -43,15 +43,15 @@ class Citador {
           attachment: "Anhang",
           settings: {
             mentionUser: {
-              title: 'Mention the quoted user',
-              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+              title: 'Erwähne den zitierten Nutzer',
+              description: 'Ob der zitierte Nutzer erwähnt werden soll. Du kannst auch auf das Avatar klicken, um eine Erwähnung anzuhängen.'
             },
             useFallbackCodeblock: {
               title: "Im Code-Format senden",
               choices: ["Niemals", "Immer", "Nur, falls keine Berechtigung"]
             },
             disableServers: {
-              title: "Deactiviere Zitate für spezielle Server",
+              title: "Deaktiviere Zitate für spezielle Server",
               description: "Klicke auf einen Server um Zitate zu deaktivieren. Klicke erneut zum Aktivieren.</br>Du kannst auch auf einen Server rechtsklicken zum Umschalten.",
               context: "Zitate einbetten"
             },
