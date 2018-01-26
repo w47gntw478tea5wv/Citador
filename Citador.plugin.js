@@ -380,7 +380,7 @@ class Citador {
   attachMention(user) {
     if (!$('form')[0]) return;
     ReactUtilities.getOwnerInstance($('form')[0]).setState({
-      textValue: ReactUtilities.getOwnerInstance($('form')[0]).state.textValue + `@${user.username}#${user.discriminator}`
+      textValue: ReactUtilities.getOwnerInstance($('form')[0]).state.textValue + `@${user.username}#${user.discriminator} `
     });
   }
   
