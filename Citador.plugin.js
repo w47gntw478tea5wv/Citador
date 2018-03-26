@@ -86,12 +86,12 @@ class Citador {
         };
       case 'ja': 
         return {
-          description: "誰かをチャットで引用します",
+          description: "チャットメッセージを引用します。",
           startMsg: "起動完了",
           quoteTooltip: "引用",
           deleteTooltip: "削除",
-          noPermTooltip: "引用する権限がありません",
-          noChatTooltip: "No permission to send messages",
+          noPermTooltip: "引用する権限がありません。",
+          noChatTooltip: "このチャンネルでメッセージを送信する権利がありません。",
           attachment: "添付ファイル",
           settings: {
             mentionUser: {
@@ -107,7 +107,7 @@ class Citador {
               description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
               context: "Embed quotes"
             },
-            reset: 'Reset settings'
+            reset: '設定をリセット'
           }
         };
       default: 
