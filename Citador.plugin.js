@@ -65,12 +65,12 @@ class Citador {
           quoteTooltip: "Цитировать",
           deleteTooltip: "Удалить",
           noPermTooltip: "Нет прав для цитирования",
-          noChatTooltip: "No permission to send messages",
+          noChatTooltip: "Нет прав для отправки сообщений",
           attachment: "Вложение",
           settings: {
             mentionUser: {
-              title: 'Mention the quoted user',
-              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+              title: 'Упоминать цитируемого пользователя',
+              description: 'Переключает упоминание пользователя при цитировании. Вы так же можете нажать на аватарку цитируемого пользователя, чтобы упомянуть его.'
             },
             useFallbackCodeblock: {
               title: "Форматировать цитаты блоками кода",
