@@ -43,8 +43,8 @@ class Citador {
           attachment: "Anhang",
           settings: {
             mentionUser: {
-              title: 'Erwähne den zitierten Nutzer',
-              description: 'Ob der zitierte Nutzer erwähnt werden soll. Du kannst auch auf das Avatar klicken, um eine Erwähnung anzuhängen.'
+              title: 'Mention the quoted user',
+              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
             },
             useFallbackCodeblock: {
               title: "Im Code-Format senden",
@@ -90,8 +90,8 @@ class Citador {
           startMsg: "起動完了",
           quoteTooltip: "引用",
           deleteTooltip: "削除",
-          noPermTooltip: "引用する権限がありません。",
-          noChatTooltip: "このチャンネルでメッセージを送信する権利がありません。",
+          noPermTooltip: "引用する権限がありません",
+          noChatTooltip: "このチャンネルでメッセージを送信する権利がありません",
           attachment: "添付ファイル",
           settings: {
             mentionUser: {
@@ -143,7 +143,7 @@ class Citador {
   
   getName         () { return "Citador";            }
   getDescription  () { return this.local.description}
-  getVersion      () { return "1.7.2";              }
+  getVersion      () { return "1.7.3";              }
   getAuthor       () { return "Nirewen";            }
   unload          () { this.deleteEverything();     }
   stop            () { this.deleteEverything();     }
@@ -171,6 +171,7 @@ class Citador {
     let self = this;
     PluginUtilities.checkForUpdate(this.getName(), this.getVersion(), "https://raw.githubusercontent.com/nirewen/Citador/master/Citador.plugin.js");
     PluginUtilities.showToast(`${this.getName()} ${this.getVersion()} ${this.local.startMsg.toLowerCase()}`);
+    this.switchObserver    = PluginUtilities.createSwitchObserver(this);
     this.MessageParser     = InternalUtilities.WebpackModules.findByUniqueProperties(["createBotMessage"]);
     this.MessageQueue      = InternalUtilities.WebpackModules.findByUniqueProperties(["enqueue"]);
     this.MessageController = InternalUtilities.WebpackModules.findByUniqueProperties(["sendClydeError"]);
@@ -182,8 +183,8 @@ class Citador {
     this.quoteURL          = 'https://github.com/nirewen/Citador?';
     this.CDN_URL           = 'https://cdn.discordapp.com/avatars/';
     this.ASSETS_URL        = 'https://discordapp.com';
-    this.loadSettings();
   
+    this.loadSettings();
     this.patchExternalLinks();
     
     $(document).on("mouseover.citador", function(e) {
@@ -329,7 +330,7 @@ class Citador {
     this.log(this.local.startMsg, "info");
   }
   
-  onSwitch () {
+  onChannelSwitch () {
     if (this.quoteProps) {
       this.attachParser();
       
@@ -577,15 +578,15 @@ class Citador {
   observer(e) {
     if (!e.addedNodes.length || !(e.addedNodes[0] instanceof Element) || !e.addedNodes[0].classList) return;
     let elem  = e.addedNodes[0],
-      context = elem.classList.contains('context-menu') ? elem : elem.querySelector('.context-menu');
+      context = elem.classList.contains('contextMenu-uoJTbz') ? elem : elem.querySelector('.contextMenu-uoJTbz');
     if (!context) return;
     
-    let props = ReactUtilities.getReactProperty(context, "return.memoizedProps.guild");
+    let {guild, target} = ReactUtilities.getReactProperty(context, "return.memoizedProps");
     
-    if (!props) return;
+    if (!guild && (!target || target.className !== "avatar-small")) return;
     
-    let {id} = props;
-    $(context).find('.item').first().after(
+    let {id} = guild;
+    $(context).find('.item-1XYaYf').first().after(
       $(new PluginContextMenu.ToggleItem(this.local.settings.disableServers.context, !this.settings.disabledServers.includes(id), {
         callback: e => {
           if (this.settings.disabledServers.includes(id))
@@ -635,6 +636,7 @@ class Citador {
     $('.messages .message-group').off('mouseover');
     $('.messages .message-group').off('mouseleave');
     this.remove("citador-css");
+    this.switchObserver.disconnect();
     this.initialized = false;
     this.cancel();
   }
