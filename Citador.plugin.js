@@ -583,7 +583,7 @@ class Citador {
     
     let {guild, target} = ReactUtilities.getReactProperty(context, "return.memoizedProps");
     
-    if (!guild && (!target || target.className !== "avatar-small")) return;
+    if (!guild || target.className !== "avatar-small") return;
     
     let {id} = guild;
     $(context).find('.item-1XYaYf').first().after(
