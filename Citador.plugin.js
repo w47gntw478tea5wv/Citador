@@ -95,17 +95,17 @@ class Citador {
           attachment: "添付ファイル",
           settings: {
             mentionUser: {
-              title: 'Mention the quoted user',
-              description: 'Whether to mention the quoted user or not. You can also click their avatar to attach their mention to your message.'
+              title: '引用されたユーザーにメンションを飛ばす',
+              description: '引用されたユーザーにメンションを送るかどうかの設定です。アバターアイコンをクリックしてもメンションを追加できます。'
             },
             useFallbackCodeblock: {
-              title: "Use codeblock quote format",
-              choices: ["Never", "Always", "Only when without permission"]
+              title: "引用にコードブロックを使用する",
+              choices: ["絶対に行わない", "常に行う", "権限が無いときのみ使用する"]
             },
             disableServers: {
-              title: "Disable embed quotes for specific servers",
-              description: "Click a server to disable embed quotes for it. Click again to enable.</br>You can also right-click a guild and toggle it.",
-              context: "Embed quotes"
+              title: "指定したサーバーでEmbedの引用を無効化します",
+              description: "サーバーをクリックするとEmbedの引用が無効になります。もう一度クリックすることで再度有効になります。</br>ギルドを右クリックすることで切り替えることもできます。",
+              context: "Embedの引用"
             },
             reset: '設定をリセット'
           }
